@@ -1,0 +1,85 @@
+
+CREATE TABLE [dbo].[t_user](
+	[u_id] [int] IDENTITY(1,1) NOT NULL,
+	[oa_id] [int] NOT NULL,
+	[ding_id] [int] NOT NULL,
+	[u_nickname] [varchar](50) NULL,
+	[u_short_name] [varchar](50) NULL,
+	[u_username] [varchar](50) NOT NULL,
+	[u_password] [varchar](50) NOT NULL,
+	[u_email] [varchar](50) NULL,
+	[u_status] [varchar](50) NULL,
+	[u_role] [int] NULL,
+	[u_department] [varchar](50) NULL,
+	[token] [varchar](50) NULL,
+	[datetime] [datetime] NULL,
+ CONSTRAINT [PK_t_user] PRIMARY KEY CLUSTERED 
+(
+	[u_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[t_affair](
+	[a_id] [int] IDENTITY(1,1) NOT NULL,
+	[a_affairs] [varchar](50) NULL,
+	[a_sponser_id] [int] NULL,
+	[a_project_id] [int] NULL,
+	[a_start] [datetime] NULL,
+	[a_end] [datetime] NULL,
+	[datetime] [datetime] NULL,
+ CONSTRAINT [PK_t_affair] PRIMARY KEY CLUSTERED 
+(
+	[a_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[t_infect](
+	[i_id] [int] IDENTITY(1,1) NOT NULL,
+	[i_affair_id] [int] NULL,
+	[i_user_id] [int] NULL,
+	[datetime] [datetime] NULL,
+ CONSTRAINT [PK_t_infect] PRIMARY KEY CLUSTERED 
+(
+	[i_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+CREATE TABLE [dbo].[t_judge](
+	[j_id] [int] IDENTITY(1,1) NOT NULL,
+	[j_affair_id] [int] NULL,
+	[j_affair_sponser_id] [int] NULL,
+	[j_evaluator_id] [int] NULL,
+	[j_evaluated_id] [int] NULL,
+	[j_atitude] [int] NULL,
+	[j_quality_efficient] [int] NULL,
+	[j_complishment] [int] NULL,
+	[datetime] [datetime] NULL,
+ CONSTRAINT [PK_t_judge] PRIMARY KEY CLUSTERED 
+(
+	[j_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+CREATE TABLE [dbo].[t_orgnization](
+	[o_id] [int] IDENTITY(1,1) NOT NULL,
+	[o_project_id] [int] NULL,
+	[o_project_name] [varchar](50) NULL,
+	[o_user_id] [int] NULL,
+	[o_user_name] [varchar](50) NULL,
+	[o_role_id] [int] NULL,
+	[datetime] [datetime] NULL,
+ CONSTRAINT [PK_t_orgnization] PRIMARY KEY CLUSTERED 
+(
+	[o_id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+
+
+
+
+
+
