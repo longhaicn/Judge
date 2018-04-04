@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.judge.biz.UserBiz;
 import com.judge.po.User;
 import com.judge.utils.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Controller
 public class UserController {    // 自动注入UserService
+    private static final Log LOG = LogFactory.getLog(UserController.class.getName());
     private final  String KEY = "poly_2018";
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
@@ -32,7 +35,7 @@ public class UserController {    // 自动注入UserService
      * 获取指定id的用户
      */
     @RequestMapping(value = "/findById")
-    public void findById(String uId, HttpServletRequest request, HttpServletResponse response) {
+    public void findById(HttpServletRequest request, HttpServletResponse response,String uId) {
         Integer id = Integer.parseInt(uId);
         User user = userBiz.findById(id);
         List<User> list = new ArrayList<User>();
@@ -45,7 +48,7 @@ public class UserController {    // 自动注入UserService
     }
 
     @RequestMapping(value = "/loginByPass")
-    public void loginByPass(String uUsername,String uPassword, HttpServletRequest request, HttpServletResponse response){
+    public void loginByPass(HttpServletRequest request, HttpServletResponse response,String uUsername,String uPassword){
         User user = userBiz.loginByPass(uUsername,uPassword);
         List<User> list = new ArrayList<User>();
         list.add(user);
@@ -56,7 +59,7 @@ public class UserController {    // 自动注入UserService
         ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
     }
     @RequestMapping(value = "/loginByToken")
-    public void loginByToken(String uId,String token, HttpServletRequest request, HttpServletResponse response){
+    public void loginByToken(HttpServletRequest request, HttpServletResponse response,String uId,String token){
         Integer id = Integer.parseInt(uId);
         User user = userBiz.loginByToken(id,token);
         List<User> list = new ArrayList<User>();
@@ -70,7 +73,7 @@ public class UserController {    // 自动注入UserService
 
     @ResponseBody
     @RequestMapping(value = "/searchuser")
-    public Object searchuser(String words,HttpServletRequest request,HttpServletResponse response){
+    public Object searchuser(HttpServletRequest request,HttpServletResponse response,String words){
         JSONObject resultObj = new JSONObject();
         List<User> users = userBiz.search(words);
         if(users != null ){
@@ -87,42 +90,49 @@ public class UserController {    // 自动注入UserService
 
     @ResponseBody
     @RequestMapping(value = "/ssologin")
-    public Object ssologin(HttpServletRequest request,HttpServletResponse response){
+    public Object ssologin(HttpServletRequest request,HttpServletResponse response,String sso){
         JSONObject resultObj = new JSONObject();
-        if (request.getParameter("sso")==null || "".equals(request.getParameter("sso"))){
+        if (sso==null || "".equals(sso)){
             resultObj.put("code", "1");
             resultObj.put("desc", "sso should not be null");
             return resultObj;
         }
-        String ding_id = "" ;
-        String oa_id = "";
-        String datestr = "" ;
+        String ding_id = null ;
+        String oa_id = null;
+        String datestr = null ;
         //单点登陆 ding_id#oa_id#日期
-        String b64_ecb_str = request.getParameter("sso");
-        if (b64_ecb_str != null && !"".equals(b64_ecb_str)){
-            //替换字符
-            b64_ecb_str = DesECBUtil.DeReplaceChars(b64_ecb_str);
-            try {
-                //解密
-                b64_ecb_str = DesECBUtil.decrypt(b64_ecb_str, KEY);
-                String[] str = b64_ecb_str.split("#");
-                ding_id = str[0];
-                oa_id = str[1];
-                datestr = str[2];
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MINUTE, 5);
-                if(sdf.format(calendar.getTime()).compareTo(datestr) == -1){
-                    resultObj.put("code", "4");
-                    resultObj.put("desc", "非法操作,如有问题联系管理员.");
-                    return resultObj;
-                }
-            } catch (Exception e) {
+        String b64_ecb_str = sso;
+        //替换字符
+        b64_ecb_str = DesECBUtil.DeReplaceChars(b64_ecb_str);
+        try {
+            //解密
+            b64_ecb_str = DesECBUtil.decrypt(b64_ecb_str, KEY);
+            String[] str = b64_ecb_str.split("#");
+            ding_id = str[0];
+            oa_id = str[1];
+            datestr = str[2];
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 5);
+            LOG.error("b64_ecb_str:"+b64_ecb_str);
+            if(sdf.format(calendar.getTime()).compareTo(datestr) == -1){
+                LOG.error("b64_ecb_str(-1):"+b64_ecb_str);
                 resultObj.put("code", "4");
                 resultObj.put("desc", "非法操作,如有问题联系管理员.");
                 return resultObj;
             }
+        } catch (Exception e) {
+            LOG.error("Exception(b64_ecb_str):"+b64_ecb_str);
+            resultObj.put("code", "4");
+            resultObj.put("desc", "非法操作,如有问题联系管理员.");
+            return resultObj;
         }
-        User user = userBiz.findByOAId(oa_id);
+
+        User user = null;
+        if(oa_id == null || "".equals(oa_id) || "null".equals(oa_id)){
+            user= userBiz.findByDingId(ding_id);
+        }else{
+            user= userBiz.findByOAId(oa_id);
+        }
         if(user != null ){//登陆成功
             request.getSession().setAttribute("current_user", user);
             resultObj.put("code", "0");
@@ -130,6 +140,9 @@ public class UserController {    // 自动注入UserService
             resultObj.put("data",user);
             return resultObj;
         }else{
+            LOG.error("ding_id:"+ding_id);
+            LOG.error("oa_id:"+oa_id);
+            LOG.error("datestr:"+datestr);
             resultObj.put("code", "3");
             resultObj.put("desc", "异常,请联系管理员");
             return resultObj;
@@ -179,18 +192,18 @@ public class UserController {    // 自动注入UserService
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, -1);
-        usersyncindate(local_sdf.format(calendar.getTime()));
+        usersyncindate(local_sdf.format(calendar.getTime()),null,null);
     }
 
     @Scheduled(cron = "0 0 0 15 * ?")
     public void taskmonth(){
         System.out.println("###############################每月十五号全量同步人员库###############################");
-        usersyncindate(null);
+        usersyncindate(null,null,null);
     }
 
     @ResponseBody
     @RequestMapping(value = "/usersyncindate")
-    public String usersyncindate(String datestr){
+    public String usersyncindate(String datestr,HttpServletRequest request,HttpServletResponse response){
         JSONObject resultObj = new JSONObject();
         String ecb_data = "";
         try {

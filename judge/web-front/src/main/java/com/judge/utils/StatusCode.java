@@ -7,7 +7,7 @@ public class StatusCode {
 
     public static String CODE_SUCCESS = "0";          //访问成功
 
-    public static String CODE_ERROR = "001";          //访问错误
+    public static String CODE_ERROR = "1";          //访问错误
 
     public static String CODE_ERROR_PARAMETER = "002";//参数错误
 

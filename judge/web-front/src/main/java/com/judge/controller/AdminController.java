@@ -28,19 +28,20 @@ public class AdminController {
      * 获取指定id的用户
      */
         @RequestMapping(value = "/adminLogin")
-    public void adminLogin(String ad_name,String ad_password, HttpServletRequest request, HttpServletResponse response) {
+    public void adminLogin(HttpServletRequest request, HttpServletResponse response,String adName,String adPassword) {
 
-        Admin admin = adminBiz.adminLogin(ad_name,ad_password);
+        Admin admin = adminBiz.adminLogin(adName,adPassword);
         List<Admin> list = new ArrayList<Admin>();
         list.add(admin);
         ListObject listObject = new ListObject();
         listObject.setData(list);
         if(null==admin){
-            listObject.setCode(StatusCode.CODE_SUCCESS);
-            listObject.setDesc("Fail Login");
+            listObject.setCode(StatusCode.CODE_ERROR);
+            listObject.setDesc("密码错误");
         }else{
+            request.getSession().setAttribute("current_user", admin);
             listObject.setCode(StatusCode.CODE_SUCCESS);
-            listObject.setDesc("success");
+            listObject.setDesc("登录成功");
         }
 
         ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
@@ -50,15 +51,15 @@ public class AdminController {
      * 获取指定id的用户
      */
     @RequestMapping(value = "/adminchangepwd")
-    public void adminchangepwd(String ad_name,String ad_password,String new_pwd, HttpServletRequest request, HttpServletResponse response) {
+    public void adminchangepwd(HttpServletRequest request, HttpServletResponse response,String adName,String adPassword,String newPwd) {
 
-        int admin = adminBiz.adminchangepwd(ad_name,ad_password,new_pwd);
+        int admin = adminBiz.adminchangepwd(adName,adPassword,newPwd);
         List<String> list = new ArrayList<String>();
         list.add("修改密码");
         ListObject listObject = new ListObject();
         listObject.setData(list);
-        if(admin<1){
-            listObject.setCode(StatusCode.CODE_SUCCESS);
+        if(admin < 1){
+            listObject.setCode(StatusCode.CODE_ERROR);
             listObject.setDesc("修改失败");
         }else{
             listObject.setCode(StatusCode.CODE_SUCCESS);

@@ -4,14 +4,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.judge.biz.JudgeBiz;
+import com.judge.biz.OrgnizationBiz;
 import com.judge.po.Judge;
+import com.judge.po.Orgnization;
 import com.judge.utils.JsonUtils;
 import com.judge.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,16 +25,21 @@ public class JudgeController {    // 自动注入UserService
     @Autowired
     private JudgeBiz judgeBiz;
 
+    @Autowired
+    private OrgnizationBiz orgnizationBiz;
+
     @RequestMapping(value = "/newJudge" , method = RequestMethod.POST)
-    public void newJudge(String data, HttpServletRequest request,HttpServletResponse response){
+    public void newJudge(HttpServletRequest request,HttpServletResponse response,String data){
         JSONObject resultObj = new JSONObject();
         JSONArray judge_json = JSON.parseArray(data);
         List<Judge> judgeList = new ArrayList<Judge>();
+        Orgnization org = null;
         try{
             for (int i = 0; i < judge_json.size(); i++) {
                 Judge judge = new Judge();
                 judge.setjAffairId(judge_json.getJSONObject(i).getInteger("jAffairId"));
-                judge.setjEvaluatorId(judge_json.getJSONObject(i).getInteger("jEvaluatorRoleId"));
+                org = orgnizationBiz.getOrgByPIdAndUId(judge_json.getJSONObject(i).getInteger("jProjectId"),judge_json.getJSONObject(i).getInteger("jEvaluatorId"));
+                judge.setjEvaluatorId(org.getoRoleId());
                 judge.setjProjectId(judge_json.getJSONObject(i).getInteger("jProjectId"));
                 judge.setjEvaluatorId(judge_json.getJSONObject(i).getInteger("jEvaluatorId"));
                 judge.setjEvaluatedId(judge_json.getJSONObject(i).getInteger("jEvaluatedId"));
@@ -55,5 +61,10 @@ public class JudgeController {    // 自动注入UserService
         resultObj.put("desc", "success");
         ResponseUtils.renderJson(response, JsonUtils.toJson(resultObj));
         return;
+    }
+
+    @RequestMapping(value = "/compute")
+    public void compute(HttpServletRequest request,HttpServletResponse response){
+        judgeBiz.compute();
     }
 }

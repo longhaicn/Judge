@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 
 import com.alibaba.fastjson.JSONObject;
 import com.judge.controller.AffairController;
+import com.judge.utils.DesECBUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,4 +69,10 @@ public class MyTest {
 		    e.printStackTrace();
         }
 	}
+	@Test
+    public void test() throws Exception {
+        String b64_ecb_str = DesECBUtil.DeReplaceChars("RtDr2KqH2MWmYo-HQ6Wc65YSycM4G7sDu9a6EBVwt4I_");
+        b64_ecb_str = DesECBUtil.decrypt(b64_ecb_str, "poly_2018");
+        System.out.println(b64_ecb_str);
+    }
 }

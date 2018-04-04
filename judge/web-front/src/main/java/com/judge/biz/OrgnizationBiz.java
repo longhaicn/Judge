@@ -29,4 +29,8 @@ public class OrgnizationBiz {
     public List<User> searchUsersByproidAndroleid(int project_id,int roleid){
         return orgnizationDao.searchUsersByproidAndroleid(project_id,roleid);
     }
+
+    public Orgnization getOrgByPIdAndUId(int project_id,int u_id){
+        return orgnizationDao.getOrgByPIdAndUId(project_id,u_id);
+    }
 }

@@ -1,25 +1,24 @@
 package com.judge.controller;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+
 import com.alibaba.fastjson.JSONObject;
-import com.judge.biz.OrgnizationBiz;
 import com.judge.biz.ProjectBiz;
 import com.judge.biz.ProjectStageBiz;
-import com.judge.po.Orgnization;
 import com.judge.po.Project;
 import com.judge.po.ProjectStage;
-import com.judge.utils.*;
+import com.judge.utils.JsonUtils;
+import com.judge.utils.ListObject;
+import com.judge.utils.ResponseUtils;
+import com.judge.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 
@@ -33,55 +32,15 @@ public class ProjectController {
     @Qualifier("ProjectStageBiz")
     private ProjectStageBiz projectStageBiz;
 
-    @Autowired
-    @Qualifier("OrgnizationBiz")
-    private OrgnizationBiz orgnizationBiz;
-
     /*
      * 新建项目
      */
     @RequestMapping(value = "/insertProject" , method = RequestMethod.POST)
-    public void insertProject(String data, HttpServletRequest request, HttpServletResponse response){
+    public void insertProject(HttpServletRequest request, HttpServletResponse response,String data){
         JSONObject resultObj = new JSONObject();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try{
-            Project project = new Project();
-            JSONObject project_json = JSON.parseObject(data);
-            project.setpName(project_json.getString("pName"));
-            project.setpDescription(project_json.getString("pDescription"));
-            project.setpUserId(project_json.getInteger("pUserId"));
-            project.setpUserName(project_json.getString("pUserName"));
-            project.setpClass(project_json.getInteger("pClass"));
-            project.setpStart(new Date());
-            project.setpEnd(sdf.parse(project_json.getString("pEnd")));
-            project.setpAward(project_json.getLong("pAward"));
-            project.setDatetime(project.getpStart());
-            projectBiz.insert(project);
-            System.out.println(JsonUtils.toJson(project));
-            JSONArray stages_ja = project_json.getJSONArray("stages");
-            for (int i = 0; i < stages_ja.size(); i++) {
-                ProjectStage projectStage = new ProjectStage();
-                projectStage.setPsProjectId(project.getpId());
-                projectStage.setPsStage(stages_ja.getJSONObject(i).getInteger("psStage"));
-                projectStage.setPsStageDescription(stages_ja.getJSONObject(i).getString("psStageDescription"));
-                projectStage.setPsStart(sdf.parse(stages_ja.getJSONObject(i).getString("psStart")));
-                projectStage.setPsEnd(sdf.parse(stages_ja.getJSONObject(i).getString("psEnd")));
-                projectStage.setPsAward(stages_ja.getJSONObject(i).getLong("psAward"));
-                projectStage.setDatetime(new Date());
-                projectStageBiz.insertProjectStageObj(projectStage);
-            }
-
-            JSONArray users_ja = project_json.getJSONArray("users");
-            for (int i = 0; i < users_ja.size(); i++) {
-                Orgnization orgnization = new Orgnization();
-                orgnization.setoUserId(users_ja.getJSONObject(i).getIntValue("u_id"));
-                orgnization.setoUserName(users_ja.getJSONObject(i).getString("u_nickname"));
-                orgnization.setoRoleId(users_ja.getJSONObject(i).getIntValue("oRoleId"));
-                orgnization.setDatetime(new Date());
-                orgnization.setoProjectId(project.getpId());
-                orgnization.setoProjectName(project.getpName());
-                orgnizationBiz.insertOrgObj(orgnization);
-            }
+            projectBiz.insertProject(data);
         }catch (Exception e){
             resultObj.put("code", "1");
             resultObj.put("desc", "error:"+e.getMessage());
@@ -93,7 +52,7 @@ public class ProjectController {
         ResponseUtils.renderJson(response, JsonUtils.toJson(resultObj));
     }
     @RequestMapping(value = "/queryProjectByUId")
-    public void queryProjectByUId(int uId, HttpServletRequest request, HttpServletResponse response) {
+    public void queryProjectByUId(HttpServletRequest request, HttpServletResponse response,int uId) {
         List<Project> list = projectBiz.queryProjectByUId(uId);
         ListObject listObject = new ListObject();
         listObject.setData(list);
@@ -103,7 +62,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/selectProjectByOrguserID")
-    public void selectProjectByOrguserID(int uId, HttpServletRequest request, HttpServletResponse response) {
+    public void selectProjectByOrguserID(HttpServletRequest request, HttpServletResponse response,int uId) {
         List<Project> list = projectBiz.selectProjectByOrguserID(uId);
         ListObject listObject = new ListObject();
         listObject.setData(list);
@@ -113,7 +72,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/selectProjectByID")
-    public void selectProjectByID(int projectId, HttpServletRequest request, HttpServletResponse response) {
+    public void selectProjectByID(HttpServletRequest request, HttpServletResponse response,int projectId) {
         JSONObject resultObj = new JSONObject();
         Project project = projectBiz.queryProjectById(projectId);
         resultObj.put("code", "0");
@@ -133,12 +92,28 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/selectProjectStageByProjectid")
-    public void selectProjectStageByProjectid(int projectId, HttpServletRequest request, HttpServletResponse response) {
+    public void selectProjectStageByProjectid(HttpServletRequest request, HttpServletResponse response,int projectId) {
         List<ProjectStage> list = projectStageBiz.selectProjectStageByProjectID(projectId);
         ListObject listObject = new ListObject();
         listObject.setData(list);
         listObject.setCode(StatusCode.CODE_SUCCESS);
         listObject.setDesc("success");
         ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
+    }
+
+    @RequestMapping(value = "/searchproject")
+    public void searchProject(HttpServletRequest request, HttpServletResponse response,String words) {
+        try {
+            request.setCharacterEncoding("utf-8");
+            List<Project> list = projectBiz.searchProject(new String(words.getBytes("iso-8859-1"), "utf-8"));
+            ListObject listObject = new ListObject();
+            listObject.setData(list);
+            listObject.setCode(StatusCode.CODE_SUCCESS);
+            listObject.setDesc("success");
+            ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 }

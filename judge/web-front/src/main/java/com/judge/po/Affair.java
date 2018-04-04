@@ -18,6 +18,16 @@ public class Affair {
 
     private Date datetime;
 
+    private String aProjectName;
+
+    public String getaProjectName() {
+        return aProjectName;
+    }
+
+    public void setaProjectName(String aProjectName) {
+        this.aProjectName = aProjectName;
+    }
+
     public Integer getaId() {
         return aId;
     }

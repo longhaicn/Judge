@@ -14,10 +14,13 @@ public interface UserDao {
      * 查询某个公告的信息
      */
     @Select("select * from t_user where u_id = #{u_id}")
-    User findById(Integer info_id);
+    User findById(Integer u_id);
 
     @Select("select * from t_user where oa_id = #{oa_id}")
     User findByOAId(String oa_id);
+
+    @Select("select * from t_user where ding_id = #{ding_id}")
+    User findByDingId(String ding_id);
     /* 2、 根据用户ID查询用户信息
      * 查询某个公告的信息
      */
@@ -52,6 +55,26 @@ public interface UserDao {
     @Lang(SimpleSelectInLangDriver.class)
     List<User> selectInIds(@Param("userids")int[] userids);
 
-    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime from t_infect i join t_user u on i.i_user_id = u.u_id where i.i_affair_id = #{0} and u.u_id != #{1}")
+    /**
+     * 非CEO角色调用的 需要评分人员
+     * @param a_id
+     * @param u_id
+     * @return
+     */
+    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime \n" +
+            "  from t_infect i join t_user u on i.i_user_id = u.u_id \n" +
+            "  join t_affair a on i.i_affair_id = a.a_id \n" +
+            "  join t_orgnization o on a.a_project_id = o.o_project_id and i.i_user_id = o.o_user_id \n" +
+            "  where o.o_role_id !=1 and i.i_affair_id = #{0} and u.u_id != #{1}")
     List<User> selectUsersForJudge(int a_id,int u_id);
+
+    /**
+     * CEO角色调用的 需要评分人员
+     * @param a_id
+     * @return
+     */
+    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime \n" +
+            "  from t_affair a join t_user u on a.a_sponser_id = u.u_id \n" +
+            "  where a.a_id = #{a_id}")
+    List<User> selectUsersForJudgeCEO(int a_id);
 }

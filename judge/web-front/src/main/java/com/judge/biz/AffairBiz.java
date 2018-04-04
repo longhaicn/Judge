@@ -110,7 +110,19 @@ public class AffairBiz {
         return affairDao.selectAffairOutdateByUserId(local_sdf.format(new Date()),o_user_id);
     }
 
+    /**
+     * 查询需要评分的对象
+     * @param a_id
+     * @param u_id
+     * @return
+     */
     public List<User> selectUsersForJudge(int a_id,int u_id){
-        return userDao.selectUsersForJudge(a_id,u_id);
+        User user = orgnizationDao.getUserByAIdAndUId(a_id,u_id);
+        if(user.getuRole() == 1){
+            //CEO
+            return userDao.selectUsersForJudgeCEO(a_id);
+        }else{
+            return userDao.selectUsersForJudge(a_id,u_id);
+        }
     }
 }

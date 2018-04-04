@@ -24,4 +24,7 @@ public interface InfectDao {
 
     @Update("UPDATE t_infect set i_scored = #{2} WHERE i_affair_id = #{0} and i_user_id = #{1}")
     void updateScore(int affair_id,int u_id,int score);
+
+    @Select("select * from t_infect where i_affair_id = #{a_id}")
+    List<Infect> cpu_selectByAId(int a_id);
 }

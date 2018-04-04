@@ -23,6 +23,26 @@ public class Project {
 
     private Date datetime;
 
+    private Integer major;
+
+    private String majorName;
+
+    public Integer getMajor() {
+        return major;
+    }
+
+    public void setMajor(Integer major) {
+        this.major = major;
+    }
+
+    public String getMajorName() {
+        return majorName;
+    }
+
+    public void setMajorName(String majorName) {
+        this.majorName = majorName;
+    }
+
     public Integer getpId() {
         return pId;
     }

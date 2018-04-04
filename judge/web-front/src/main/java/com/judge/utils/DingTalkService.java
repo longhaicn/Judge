@@ -11,6 +11,8 @@ public class DingTalkService {
     private static final String CORPID = "ding43af2d3ba11e3298";
     private static final String SECRET = "5Cau2ZI476dyA431ttp5qMXwdSdtiqqkfgyjIeq-QMKPINRAuo8FpT4FqtDWZKGJ";
 
+    private static  final String AGENTID = "169154867";
+
     /**
      * ACCESSTOKEN地址
      */
@@ -55,7 +57,7 @@ public class DingTalkService {
         link.put("text",msg);
 
         jsonObject.put("touser",content);
-        jsonObject.put("agentid","21810402");
+        jsonObject.put("agentid",AGENTID);
         jsonObject.put("msgtype","link");
         jsonObject.put("link",link);
         String result = HttpUtils.doPost(recordUrl,jsonObject,"utf-8");

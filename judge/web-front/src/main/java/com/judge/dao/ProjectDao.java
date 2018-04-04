@@ -17,19 +17,7 @@ public interface ProjectDao {
     int insert(Project project);
     /* 2、 根据项目负责人ID查询项目信息
      */
-    @Select("select p_id, p_name, p_description, p_user_id, p_user_name, p_class, p_start, p_end, p_award, datetime from t_project where p_user_id = #{u_id,jdbcType=INTEGER}")
-    @Results({
-                    @Result(id = true, column = "p_id", property = "pId"),
-                    @Result(column = "p_name", property = "pName"),
-                    @Result(column = "p_description", property = "pDescription"),
-                    @Result(column = "p_user_id", property = "pUserId"),
-                    @Result(column = "p_user_name", property = "pUserName"),
-                    @Result(column = "p_class", property = "pClass"),
-                    @Result(column = "p_start", property = "pStart"),
-                    @Result(column = "p_end", property = "pEnd"),
-                    @Result(column = "p_award", property = "pAward"),
-                    @Result(column = "datetime", property = "datetime")
-            })
+    @Select("select * from t_project where p_user_id = #{u_id,jdbcType=INTEGER} order by p_class desc,p_start desc")
     List<Project> queryProjectByUId(@Param("u_id") Integer u_id);
 
     @Select("select * from t_project where p_id = #{p_id}")
@@ -37,21 +25,12 @@ public interface ProjectDao {
 
     /* 3、 根据人员ID查询所在项目信息
      */
-    @Select("select p.* from t_project p join t_orgnization o on p.p_id = o.o_project_id  where o.o_user_id = #{o_user_id}")
-    @Results({
-            @Result(id = true, column = "p_id", property = "pId"),
-            @Result(column = "p_name", property = "pName"),
-            @Result(column = "p_description", property = "pDescription"),
-            @Result(column = "p_user_id", property = "pUserId"),
-            @Result(column = "p_user_name", property = "pUserName"),
-            @Result(column = "p_class", property = "pClass"),
-            @Result(column = "p_start", property = "pStart"),
-            @Result(column = "p_end", property = "pEnd"),
-            @Result(column = "p_award", property = "pAward"),
-            @Result(column = "datetime", property = "datetime")
-    })
+    @Select("select p.* from t_project p join t_orgnization o on p.p_id = o.o_project_id  where o.o_user_id = #{o_user_id} order by p_class desc,p_start desc")
     List<Project> selectProjectByOrguserID(int o_user_id);
 
-    @Select("select * from t_project")
+    @Select("select * from t_project order by p_class desc,p_start desc")
     List<Project> selectAllProject();
+
+    @Select("select * from t_project where p_name like '%'+#{words}+'%'")
+    List<Project> searchProject(String words);
 }

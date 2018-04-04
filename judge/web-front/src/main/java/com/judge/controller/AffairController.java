@@ -9,14 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @Controller
 public class AffairController {    // 自动注入UserService
@@ -24,7 +21,7 @@ public class AffairController {    // 自动注入UserService
     private AffairBiz affairBiz;
 
     @RequestMapping(value = "/newAffair" , method = RequestMethod.POST)
-    public void newAffair(int aProjectId, int aSponserId, String aAffairs, String aEnd, String uIds, HttpServletRequest request, HttpServletResponse response){
+    public void newAffair(HttpServletRequest request, HttpServletResponse response,int aProjectId, int aSponserId, String aAffairs, String aEnd, String uIds){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JSONObject resultObj = new JSONObject();
         String[] str_userids = uIds.split("-");
@@ -52,7 +49,7 @@ public class AffairController {    // 自动注入UserService
         ResponseUtils.renderJson(response, JsonUtils.toJson(resultObj));
     }
     @RequestMapping(value = "/selectAffairIndate")
-    public void selectAffairIndate(int uId,HttpServletRequest request,HttpServletResponse response){
+    public void selectAffairIndate(HttpServletRequest request,HttpServletResponse response,int uId){
         JSONObject resultObj = new JSONObject();
         try{
             resultObj.put("data",affairBiz.selectAffairIndateByUserId(uId));
@@ -69,7 +66,7 @@ public class AffairController {    // 自动注入UserService
     }
 
     @RequestMapping(value = "/selectAffairIndateNotdoneByUserId")
-    public void selectAffairIndateNotdoneByUserId(int uId,HttpServletRequest request,HttpServletResponse response){
+    public void selectAffairIndateNotdoneByUserId(HttpServletRequest request,HttpServletResponse response,int uId){
         JSONObject resultObj = new JSONObject();
         try{
             resultObj.put("data",affairBiz.selectAffairIndateNotdoneByUserId(uId));
@@ -86,7 +83,7 @@ public class AffairController {    // 自动注入UserService
     }
 
     @RequestMapping(value = "/selectUsersForJudge")
-    public void selectUsersForJudge(int aId,int uId,HttpServletRequest request,HttpServletResponse response){
+    public void selectUsersForJudge(HttpServletRequest request,HttpServletResponse response,int aId,int uId){
         JSONObject resultObj = new JSONObject();
         try{
             resultObj.put("data",affairBiz.selectUsersForJudge(aId,uId));

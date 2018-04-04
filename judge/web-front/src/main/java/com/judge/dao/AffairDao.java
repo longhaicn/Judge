@@ -3,6 +3,7 @@ package com.judge.dao;
 import com.judge.com.judge.ldriver.SimpleInsertLangDriver;
 import com.judge.com.judge.ldriver.SimpleSelectInLangDriver;
 import com.judge.po.Affair;
+import com.judge.po.Infect;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Lang;
 import org.apache.ibatis.annotations.Select;
@@ -26,7 +27,7 @@ public interface AffairDao {
     @Select("select a.* from t_affair a join t_infect i on a.a_id = i.i_affair_id where and a.a_end >= #{0} and i.i_user_id = #{1}")
     List<Affair> selectAffairIndateByUserId(String end_date,int o_user_id);
 
-    @Select("select a.* from t_affair a join t_infect i on a.a_id = i.i_affair_id where i.i_scored = 0 and a.a_end >= #{0} and i.i_user_id = #{1}")
+    @Select("select a.*,p.p_name as a_project_name from t_affair a join t_infect i on a.a_id = i.i_affair_id join t_project p on a.a_project_id = p.p_id where i.i_scored = 0 and a.a_end >= #{0} and i.i_user_id = #{1}")
     List<Affair> selectAffairIndateNotdoneByUserId(String end_date,int o_user_id);
 
     @Select("select * from t_affair where a_project_id = #{0} and a_end < #{1}")
@@ -34,4 +35,7 @@ public interface AffairDao {
 
     @Select("select a.* from t_affair a join t_infect i on a.a_id = i.i_affair_id where a.a_end < #{0} and i.i_user_id = #{1}")
     List<Affair> selectAffairOutdateByUserId(String end_date,int o_user_id);
+
+    @Select("select * from t_affair")
+    List<Affair> cpu_selectAll();
 }

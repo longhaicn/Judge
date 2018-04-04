@@ -21,6 +21,9 @@ public class UserBiz {
     public User findByOAId(String oa_id){
         return userDao.findByOAId(oa_id);
     }
+    public User findByDingId(String ding_id){
+        return userDao.findByDingId(ding_id);
+    }
     public User loginByPass(String u_username,String u_password){
         return userDao.loginByPass(u_username,u_password);
     }
