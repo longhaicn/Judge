@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <style>
+        .mui-scroll-wrapper {
+            top: 46px;
+        }
+
+        .mui-h4 {
+            font-family: roman;
+            font-size: 15px;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 id="title" class="mui-title mui-action-back mui-text-center">被评价人</h1>
+</header>
+<div class="mui-content"></div>
+<div class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <ul id="reasonlist" class="mui-table-view">
+            <!--<li class="mui-table-view-cell">-->
+                <!--<div class="mui-table">-->
+                    <!--<div class="mui-table-cell mui-col-xs-12">-->
+                        <!--<div class="mui-ellipsis mui-h4">第三次绩效考核测试</div>-->
+                        <!--<div class="mui-h5 mui-ellipsis-2">Hi，李明明，申请交行信息卡，100元等你拿，李明明，申请交行信息卡，100元等你拿，</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="mui-table">-->
+                    <!--<div class="mui-table-cell mui-col-xs-6">-->
+                        <!--<div class="mui-h5">评价人：李四</div>-->
+                    <!--</div>-->
+                    <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+                        <!--<div class="mui-h5">2018-04-09 18:43:43</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        mui('.mui-scroll-wrapper').scroll();
+        mui.ready(function () {
+            var projectId = app.getUrlParam("projectId", window);
+            var userId = app.getUrlParam("uId", window);
+            var uUsername = app.getUrlParam("uUsername", window);
+            var startDate = app.getUrlParam("start", window);
+            var endDate = app.getUrlParam("end", window);
+            var table = document.body.querySelector('.mui-table-view');
+            $('#title').html("被评价人: "+uUsername);
+            app.getAllData({
+                url: app.baseURL + "selectFeedbackByEtorId?projectId=" + projectId + "&uId=" + userId + "&start=" + startDate + "&end=" + endDate,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code, a_desc) {
+                    switch (a_code) {
+                        case '0':
+                            table.appendChild(createFragment(a_record));
+                            break;
+                        default:
+                            mui.toast(a_desc, {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                    }
+                }
+            });
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    li.id = item.fId;
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'mui-table-cell mui-col-xs-12';
+                    var affairDiv = document.createElement('div');
+                    affairDiv.className = 'mui-ellipsis mui-h4';
+                    affairDiv.innerHTML = item.affair;
+                    tableCellDiv.appendChild(affairDiv);
+                    var reasonDiv = document.createElement('div');
+                    reasonDiv.className = 'mui-h5 mui-ellipsis-2';
+                    reasonDiv.innerHTML = item.reason;
+                    tableCellDiv.appendChild(reasonDiv);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableDiv2 = document.createElement('div');
+                    tableDiv2.className = 'mui-table';
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'mui-table-cell mui-col-xs-6';
+                    var evaluatorDiv = document.createElement('div');
+                    evaluatorDiv.className = 'mui-h5';
+                    evaluatorDiv.innerText = '评价人: '+item.evaluator;
+                    tableCellDiv2.appendChild(evaluatorDiv);
+                    tableDiv2.appendChild(tableCellDiv2);
+
+                    var tableCellDiv3 = document.createElement('div');
+                    tableCellDiv3.className = 'mui-table-cell mui-col-xs-6 mui-text-right';
+                    var dateDiv = document.createElement('div');
+                    dateDiv.className = 'mui-h5';
+                    dateDiv.innerText = item.evtime;
+                    tableCellDiv3.appendChild(dateDiv);
+                    tableDiv2.appendChild(tableCellDiv3);
+                    li.appendChild(tableDiv);
+                    li.appendChild(tableDiv2);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

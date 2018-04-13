@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title></title>
+    <link href="css/mui.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <style>
+        .area {
+            margin: 20px auto 0px auto;
+        }
+
+        .mui-input-group {
+            margin-top: 10px;
+        }
+
+        .mui-input-group:first-child {
+            margin-top: 20px;
+        }
+
+        .mui-input-row label {
+            width: 50%;
+        }
+
+        .mui-input-row label ~ input {
+            width: 50%;
+        }
+
+        #topPopover {
+            position: fixed;
+            top: 16px;
+            right: 6px;
+        }
+
+        .mui-popover {
+            width: 150px;
+            height: 50px;
+        }
+
+        .award {
+            font-size: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 id="detail_title" class="mui-title"></h1>
+</header>
+<div class="mui-content">
+    <form id='project-form' class="mui-input-group">
+        <div class="mui-input-row">
+            <label>姓名</label>
+            <input id='uUsername' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>得分</label>
+            <input id='evSum' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>项目参与度</label>
+            <input id='uAfairSum' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <ul class="mui-table-view" id="reason_list">
+            <!--<li class="mui-table-view-cell">-->
+            <!--<div class="mui-table">-->
+            <!--<div class="mui-table-cell mui-col-xs-6">-->
+            <!--<div class="mui-ellipsis mui-h4">阶段一</div>-->
+            <!--<div class="mui-h5">2018-01-14－2018-06-20</div>-->
+            <!--</div>-->
+            <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+            <!--<div>-->
+            <!--<span class="award">阶段奖金:</span>-->
+            <!--<span class="mui-badge mui-badge-blue mui-text-left">5000</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+        <div class="mui-input-row">
+            <label>态度</label>
+            <input id='atitudeDetail' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>效率和质量</label>
+            <input id='qualityEfficientDetail' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>目标完成性</label>
+            <input id='complishmentDetail' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>项目奖金</label>
+            <input id='uProportion' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>职务</label>
+            <input id='uRole' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>开始时间</label>
+            <input id='pStart' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>结束时间</label>
+            <input id='pEnd' type="text" class="mui-input" readonly="readonly">
+        </div>
+    </form>
+</div>
+<script src="js/mui.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        mui.ready(function () {
+            var user = app.getUser();
+            var userId = app.getUrlParam("uId", window);
+            var projectId = app.getUrlParam("projectId", window);
+            var topLeaderId = parseInt(app.getUrlParam("major", window));
+            var leaderId = parseInt(app.getUrlParam("pUserId", window));
+            $('#detail_title').html(app.getUrlParam("pName", window));
+            $('#uUsername').val(app.getUrlParam("uUsername", window));
+            $('#evSum').val(app.getUrlParam("evSum", window));
+            $('#uAfairSum').val(app.getUrlParam("uAfairSum", window));
+            $('#atitudeDetail').val(app.getUrlParam("atitudeDetail", window));
+            $('#qualityEfficientDetail').val(app.getUrlParam("qualityEfficientDetail", window));
+            $('#complishmentDetail').val(app.getUrlParam("complishmentDetail", window));
+            $('#uProportion').val(app.getUrlParam("uProportion", window));
+            $('#uRole').val(app.getUrlParam("uRole", window));
+            $('#pStart').val(app.datetimeFormat(app.getUrlParam("pStart", window), "yyyy-MM-dd"));
+            $('#pEnd').val(app.datetimeFormat(app.getUrlParam("pEnd", window), "yyyy-MM-dd"));
+
+            if(topLeaderId === user.uId || leaderId === user.uId){
+                $('header').append('<a id="reason" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">评价情况</a>');
+                document.getElementById('reason').addEventListener('tap', function (event) {
+                    mui.openWindow({
+                        url: 'score_reason.html?projectId=' + projectId + "&uId=" + userId + "&uUsername=" + $('#uUsername').val() + "&start=" + $('#pStart').val() + "&end=" + $('#pEnd').val(),
+                        id: 'score_reason.html',
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+                })
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

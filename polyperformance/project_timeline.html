@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>横向时间轴</title>
+		<link rel="stylesheet" type="text/css" href="css/timeline.css" />
+
+		<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="js/timeline.js"></script>
+	</head>
+
+	<body>
+
+		<script type="text/javascript">
+			$(document).ready(function(e) {
+				var h = $(".about4_main ul li:first-child").height() / 2; <!--第一个li高度的一半-->
+				var h1 = $(".about4_main ul li:last-child").height() / 2; <!--最后一个li高度的一半-->
+				$(".line").css("top", h);
+				$(".line").height($(".about4_main").height() - h1 - h);
+			});
+		</script>
+
+		<div class="about4">
+			<div class="about4_ch">成长经历</div>
+			<div class="about4_main">
+
+				<div class="line"></div>
+				<ul>
+					<li>
+						第一阶段
+					</li>
+					<li>
+						第2阶段
+					</li>
+					<li>
+						第3阶段
+					</li>
+					<li>
+						第4阶段
+					</li>
+					<li>
+						第5阶段
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		</div>
+	</body>
+
+</html>

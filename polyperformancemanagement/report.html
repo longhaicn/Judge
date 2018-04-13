@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>绩效报表</title>
+    <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome-4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="select2-develop/dist/css/select2.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
+    <link rel="stylesheet" href="bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="css/animate.css">
+
+
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.min.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="select2-develop/dist/js/select2.js"></script>
+    <script type="text/javascript" src="bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"
+            charset="UTF-8"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/myApp.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 70px;
+        }
+    </style>
+    <script>
+        myApp.myUser = myApp.checkUser();
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="projectinfo.html">绩效管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="projectinfo.html">项目信息</a></li>
+                <li class="active"><a href="report.html">绩效报表</a></li>
+                <li><a href="reportProject.html">项目报表</a></li>
+                <li><a href="reportMiss.html">未评分人报表</a></li>
+            </ul>
+            <ul id="setting" class="nav navbar-nav navbar-right">
+                <li><a href="password.html">更改密码</a></li>
+                <li class="navbar-right"><a href="index.html">安全退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="panel-body">
+    <div id="toolbar" class="btn-group form-inline">
+        <div class="form-group">
+            <label for="pStart" class="col-sm-2 control-label">开始时间:</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="pStart" name="pStart" data-date-format="yyyy-mm-dd">
+            </div>
+            <label for="pEnd" class="col-sm-2 control-label">结束时间:</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="pEnd" name="pEnd" data-date-format="yyyy-mm-dd">
+            </div>
+
+        </div>
+        <div class="form-group">
+            <button type="submit" id="btnGenerate" class="btn btn-default">
+                生成报表
+            </button>
+            <button type="submit" id="btnDownload" class="btn btn-default">
+                <span class="fa fa-file-excel-o" aria-hidden="false"></span>下载
+            </button>
+        </div>
+    </div>
+    <table id="table"></table>
+</div>
+
+<script>
+    $("#btnGenerate").click(function () {
+        myApp.Util.getAllData({
+            url: myApp.baseURL + "scorereports?sr_start=" + $('#pStart').val() + "&sr_end=" + $('#pEnd').val(),
+            type: 'GET',
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                a_record && $('#table').bootstrapTable("load", a_record);
+            }
+        });
+    });
+
+    $("#btnDownload").click(function () {
+        window.open(myApp.baseURL + "getXLS");
+    })
+</script>
+
+<script>
+    $('#table').bootstrapTable({
+        toolbar: '#toolbar',                //工具按钮用哪个容器
+        search: true,                       //是否显示表格搜索，此搜索是客户端搜索
+        strictSearch: false,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        sortable: true,                    //设置为true启用所有列排序
+        sortName: "uId",
+        sortOrder: "asc",                   //排序方式
+        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+        pagination: true,                   //是否显示分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 15,                       //每页的记录行数（*）
+        pageList: [15, 25, 50, 100, 'All'],        //可供选择的每页的行数（*）
+        showColumns: true,                  //是否显示所有的列
+        showRefresh: true,                  //是否显示刷新按钮
+        minimumCountColumns: 4,             //最少允许的列数
+        clickToSelect: true,                //设置true 将在点击行时，自动选择rediobox 和 checkbox
+        maintainSelected: false,             //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        height: 713,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+        idField: "uId",
+        uniqueId: "uId",                     //每一行的唯一标识，一般为主键列
+        showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+        cardView: false,                    //是否显示详细视图
+        detailView: false,                   //是否显示父子表
+        columns: [{
+            field: 'state',
+            checkbox: true
+        }, {
+            field: 'uUsername',
+            title: '姓名',
+            sortable: true
+        }, {
+            field: 'evSum',
+            title: '得分',
+            sortable: true
+        }, {
+            field: 'uAfairSum',
+            title: '活跃因子',
+            sortable: true
+        }, {
+            field: 'atitudeDetail',
+            title: '态度',
+            sortable: true
+        }, {
+            field: 'qualityEfficientDetail',
+            title: '效率和质量',
+            sortable: true
+        }, {
+            field: 'complishmentDetail',
+            title: '目标完成性',
+            sortable: true
+        }, {
+            field: 'uPerformance',
+            title: '工资绩效',
+            sortable: true
+        }, {
+            field: 'pStart',
+            title: '开始时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }, {
+            field: 'pEnd',
+            title: '结束时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }],
+        onRefresh: function (params) {
+            getNewAllData();
+        }
+    });
+
+    function getNewAllData() {
+        var start =   $("#pStart").val();
+        var end =   $("#pEnd").val();
+        if( $.isEmptyObject(start) ||  $.isEmptyObject(end)){
+            var now = new Date();
+            var date = new Date(now.getTime() - 7 * 24 * 3600 * 1000);
+            $("#pStart").val(date.format("yyyy-MM-dd"));
+            $("#pEnd").val(now.format("yyyy-MM-dd"));
+        }
+        myApp.Util.getAllData({
+            url: myApp.baseURL + "scorereports?sr_start=" + $("#pStart").val() + "&sr_end=" + $("#pEnd").val(),
+            type: 'GET',
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                a_record && $('#table').bootstrapTable("load", a_record);
+            }
+        });
+    }
+
+    getNewAllData();
+    $('#pStart').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true
+    });
+
+    $('#pEnd').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true
+    });
+
+    $("#pStart").change(function () {
+        var startDateString = $(this).val();
+        if (startDateString) {
+            var pStartDate = new Date(startDateString);
+            var pEndDate = new Date($('#pEnd').val());
+            if (pStartDate >= pEndDate) {
+                myApp.Util.animateMessage('提示', '开始时间 不能大于等于 结束时间!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+    $("#pEnd").change(function () {
+        var endDateString = $(this).val();
+        if (endDateString) {
+            var pEndDate = new Date(endDateString);
+            var pStartDate = new Date($('#pStart').val());
+            if (pStartDate >= pEndDate) {
+                myApp.Util.animateMessage('提示', '结束时间 不能小于等于 开始时间!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+    selectProject("#pName", "选择项目");
+
+    function selectProject(elem, a_placeholder) {
+        $(elem).select2({
+            ajax: {
+                type: 'GET',
+                // url: myApp.baseURL + "searchproject",
+                url: myApp.baseURL + "searchproject",
+                dataType: 'json',
+                delay: 0,
+                data: function (params) {
+                    return {
+                        words: params.term, // search term 请求参数
+                        page: 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    var itemList = []; //当数据对象不是{id:0,text:'ANTS'}这种形式的时候，可以使用类似此方法创建新的数组对象
+                    $.each(data.data, function (index, element) {
+                        var itemObj = {
+                            id: element.pId,
+                            text: element.pName
+                        };
+                        itemList.push(itemObj);
+                    });
+                    return {
+                        results: itemList//itemList
+                        // pagination: {
+                        //     more: (params.page * 100) < 1000
+                        // }
+                    };
+                },
+                cache: true
+            },
+            width: "100%",
+            placeholder: a_placeholder,//默认文字提示
+            language: "zh-CN",
+            tags: false,//允许手动添加
+            allowClear: false,//允许清空
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // 自定义格式化防止xss注入
+            minimumInputLength: 1,//最少输入多少个字符后开始查询
+            formatResult: function formatRepo(repo) {
+                return repo.text;
+            }, // 函数用来渲染结果
+            formatSelection: function formatRepoSelection(repo) {
+                return repo.text;
+            } // 函数用于呈现当前的选择
+        });
+    }
+</script>
+</body>
+</html>

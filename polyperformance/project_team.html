@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <style>
+        .mui-scroll-wrapper {
+            top: 46px;
+        }
+
+        .oa-contact-cell.mui-table .mui-table-cell {
+            padding: 11px 0;
+            vertical-align: middle;
+        }
+
+        .oa-contact-cell {
+            position: relative;
+            margin: -11px 0;
+        }
+
+        .oa-contact-avatar {
+            width: 75px;
+        }
+
+        .oa-contact-avatar img {
+            border-radius: 50%;
+        }
+
+        .oa-contact-content {
+            width: 70%;
+        }
+
+        .oa-contact-right {
+            width: 30%;
+        }
+
+        .oa-contact-name {
+            margin-right: 20px;
+        }
+
+        .oa-contact-name, .oa-contact-position {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 id="title" class="mui-title mui-action-back mui-text-center">成员列表</h1>
+</header>
+<div class="mui-content"></div>
+<div class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+            <!--<li class="mui-table-view-cell">-->
+                <!--<div class="mui-slider-cell">-->
+                    <!--<div class="oa-contact-cell mui-table">-->
+                        <!--<div class="oa-contact-avatar mui-table-cell">-->
+                            <!--<img src="images/60x60.gif"/>-->
+                        <!--</div>-->
+                        <!--<div class="oa-contact-content mui-table-cell">-->
+                            <!--<div class="mui-clearfix">-->
+                                <!--<h4 class="oa-contact-name">叶文洁</h4>-->
+                                <!--<span class="oa-contact-position mui-h6">审计部</span>-->
+                            <!--</div>-->
+                            <!--<p class="oa-contact-email mui-h6">-->
+                                <!--yewenjie@sina.com-->
+                            <!--</p>-->
+                        <!--</div>-->
+                        <!--<div class="oa-contact-right mui-table-cell">-->
+                            <!--<span class="mui-badge mui-badge-red mui-badge-inverted">部门负责人</span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        mui('.mui-scroll-wrapper').scroll();
+        mui.ready(function () {
+            var projectId = app.getUrlParam("projectId", window);
+            var table = document.body.querySelector('.mui-table-view');
+            app.getAllData({
+                url: app.baseURL + "searchUsersByproid?projectId=" + projectId,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code, a_desc) {
+                    switch (a_code) {
+                        case '0':
+                            table.appendChild(createFragment(a_record));
+                            break;
+                        default:
+                            mui.toast(a_desc, {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                    }
+                }
+            });
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    li.id = item.uId;
+                    var sliderDiv = document.createElement('div');
+                    sliderDiv.className = 'mui-slider-cell';
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'oa-contact-cell mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'oa-contact-avatar mui-table-cell';
+                    var userImg = document.createElement('img');
+                    userImg.src = "images/default_person.png";
+                    tableCellDiv.appendChild(userImg);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'oa-contact-content mui-table-cell';
+                    var userDiv = document.createElement('div');
+                    userDiv.className = "mui-clearfix";
+                    var userH = document.createElement('h4');
+                    userH.className = "oa-contact-name";
+                    userH.innerText = item.uNickname;
+                    var userSpan = document.createElement('span');
+                    userSpan.className = "oa-contact-position mui-h6";
+                    userSpan.innerText = item.uDepartment;
+                    userDiv.appendChild(userH);
+                    userDiv.appendChild(userSpan);
+                    tableCellDiv2.appendChild(userDiv);
+                    var emailP = document.createElement('p');
+                    emailP.className = "oa-contact-email mui-h6";
+                    emailP.innerText = item.uEmail;
+                    tableCellDiv2.appendChild(emailP);
+                    tableDiv.appendChild(tableCellDiv2);
+                    var tableCellDiv3 = document.createElement('div');
+                    tableCellDiv3.className = 'oa-contact-right mui-table-cell';
+                    var roleSpan = document.createElement('span');
+                    roleSpan.className = "mui-badge mui-badge-red mui-badge-inverted";
+                    roleSpan.innerText = app.userRole[item.uRole];
+                    tableCellDiv3.appendChild(roleSpan);
+                    tableDiv.appendChild(tableCellDiv3);
+                    sliderDiv.appendChild(tableDiv);
+                    li.appendChild(sliderDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

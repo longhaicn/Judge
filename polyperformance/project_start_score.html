@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <link rel="stylesheet" type="text/css" href="css/mui.picker.min.css"/>
+    <style>
+        html,
+        body {
+            background-color: #efeff4;
+        }
+
+        .mui-input-group {
+            margin-top: 10px;
+        }
+
+        .mui-input-group:first-child {
+            margin-top: 20px;
+        }
+
+        .mui-input-row label {
+            width: 30%;
+        }
+
+        .mui-input-row label ~ input {
+            width: 70%;
+        }
+
+        .oa-contact-cell.mui-table .mui-table-cell {
+            padding: 11px 0;
+            vertical-align: middle;
+        }
+
+        .oa-contact-cell {
+            position: relative;
+            margin: -11px 0;
+        }
+
+        .oa-contact-avatar {
+            width: 75px;
+        }
+
+        .oa-contact-avatar img {
+            border-radius: 50%;
+        }
+
+        .oa-contact-content {
+            width: 70%;
+        }
+
+        .oa-contact-right {
+            width: 30%;
+        }
+
+        .oa-contact-name {
+            margin-right: 20px;
+        }
+
+        .oa-contact-name, .oa-contact-position {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+<!--侧滑菜单容器-->
+<div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable mui-slide-in">
+    <!--菜单部分-->
+    <aside id="offCanvasSide" class="mui-off-canvas-right">
+        <header class="mui-bar mui-bar-nav">
+            <a id="selectAll" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">全选</a>
+        </header>
+        <div id="offCanvasSideScroll" class="mui-scroll-wrapper" style="top: 44px;">
+            <div class="mui-scroll">
+                <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+                    <!--<li class="mui-table-view-cell mui-checkbox">-->
+                    <!--<div class="mui-slider-cell">-->
+                    <!--<div class="oa-contact-cell mui-table">-->
+                    <!--<div class="oa-contact-avatar mui-table-cell">-->
+                    <!--<img src="images/60x60.gif"/>-->
+                    <!--</div>-->
+                    <!--<div class="oa-contact-content mui-table-cell">-->
+                    <!--<div class="mui-clearfix">-->
+                    <!--<h4 class="oa-contact-name">叶文洁</h4>-->
+                    <!--<span class="oa-contact-position mui-h6">审计部</span>-->
+                    <!--</div>-->
+                    <!--<p class="oa-contact-email mui-h6">-->
+                    <!--yewenjie@sina.com-->
+                    <!--</p>-->
+                    <!--</div>-->
+                    <!--<div class="oa-contact-right mui-table-cell">-->
+                    <!--<input type="checkbox" name="" value=""/>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</li>-->
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <div class="mui-inner-wrap">
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 class="mui-title">发起评分</h1>
+            <a id="confirm" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">提交</a>
+        </header>
+        <div class="mui-content">
+            <form id='project-form' class="mui-input-group">
+                <div class="mui-input-row">
+                    <label>发起说明</label>
+                    <input id='aAffairs' type="text" class="mui-input" required>
+                </div>
+                <div class="mui-input-row">
+                    <label>参与人员</label>
+                    <input id='uIds' type="text" class="mui-input" required readonly>
+                </div>
+                <div class="mui-input-row">
+                    <label>截止时间</label>
+                    <input id='aEnd' type="text" class="mui-input" readonly="readonly">
+                </div>
+            </form>
+        </div>
+        <!-- off-canvas backdrop -->
+        <div class="mui-off-canvas-backdrop">
+        </div>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/mui.picker.min.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        //主界面和侧滑菜单界面均支持区域滚动；
+        mui('#offCanvasSideScroll').scroll();
+        mui.ready(function () {
+            var startNum = 0;
+            var projectId = app.getUrlParam("projectId", window);
+            var uIdsInput = document.getElementById('uIds');
+            var aEndInput = document.getElementById('aEnd');
+            var picker = new mui.DtPicker();
+            var table = document.body.querySelector('.mui-table-view');
+            aEndInput.addEventListener('tap', function () {
+                picker.show(function (rs) {
+                    aEndInput.value = rs.text;
+                });
+            });
+
+            uIdsInput.addEventListener('tap', function () {
+                mui('#offCanvasWrapper').offCanvas('show');
+            });
+
+            app.getAllData({
+                url: app.baseURL + "searchUsersByproid?projectId=" + projectId,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code) {
+                    switch (a_code) {
+                        case '0':
+                            table.appendChild(createFragment(a_record));
+                            break;
+                    }
+                }
+            });
+            document.getElementById("confirm").addEventListener('tap', function (event) {
+                if (startNum === 0) {
+                    var user = app.getUser();
+                    var checkboxs = $(":checked");
+                    var idText = "";
+                    mui.each(checkboxs, function (index, item) {
+                        var checkId = item.name;
+                        if (index === 0) {
+                            idText = idText + parseInt(checkId);
+                        } else {
+                            idText = idText + "-" + parseInt(checkId);
+                        }
+                    });
+                    // var str = "";
+                    // $.each($('#uIds').val(), function (index, element) {
+                    //     if (index === 0) {
+                    //         str = str + parseInt(element);
+                    //     } else {
+                    //         str = str + "-" + parseInt(element);
+                    //     }
+                    // });
+
+                    var aAffairs = $('#aAffairs').val();
+                    var aEnd = $('#aEnd').val();
+                    if (aAffairs && idText && aEnd) {
+                        startNum = 1;
+                        app.getObj({
+                            url: app.baseURL + "newAffair",
+                            data: {
+                                aProjectId: parseInt(projectId),
+                                aSponserId: user.uId,
+                                aAffairs: aAffairs,
+                                aEnd: aEnd + ":00",
+                                uIds: idText
+                            },
+                            parseFn: app.parseFn,
+                            callback: function (a_record, a_code, a_desc) {
+                                switch (a_code) {
+                                    case '0':
+                                        mui.back();
+                                        break;
+                                    default:
+                                        startNum = 0;
+                                        mui.toast(a_desc, {
+                                            duration: 'long',
+                                            type: 'div'
+                                        })
+                                }
+                            }
+                        });
+                    } else {
+                        mui.toast("请填全信息!", {
+                            duration: 'long',
+                            type: 'div'
+                        });
+                    }
+                }
+            });
+            document.getElementById('selectAll').addEventListener('tap', function () {
+                $("[type='checkbox']").each(function () {
+                    $(this).prop("checked", true);
+                });
+                selectCheck();
+            });
+            mui('.mui-table-view').on('change', 'input[type=checkbox]', function () {
+                selectCheck();
+            });
+
+            function selectCheck() {
+                var checkboxs = $(":checked");
+                var nameText = "";
+                mui.each(checkboxs, function (index, item) {
+                    if (index === 0) {
+                        nameText = nameText + item.value;
+                    } else {
+                        nameText = nameText + "," + item.value;
+                    }
+                });
+                $('#uIds').val(nameText);
+            }
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell mui-checkbox';
+                    li.id = item.uId;
+                    var sliderDiv = document.createElement('div');
+                    sliderDiv.className = 'mui-slider-cell';
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'oa-contact-cell mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'oa-contact-avatar mui-table-cell';
+                    var userImg = document.createElement('img');
+                    userImg.src = "images/default_person.png";
+                    tableCellDiv.appendChild(userImg);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'oa-contact-content mui-table-cell';
+                    var userDiv = document.createElement('div');
+                    userDiv.className = "mui-clearfix";
+                    var userH = document.createElement('h4');
+                    userH.className = "oa-contact-name";
+                    userH.innerText = item.uNickname;
+                    var userSpan = document.createElement('span');
+                    userSpan.className = "oa-contact-position mui-h6";
+                    userSpan.innerText = item.uDepartment;
+                    userDiv.appendChild(userH);
+                    userDiv.appendChild(userSpan);
+                    tableCellDiv2.appendChild(userDiv);
+                    var emailP = document.createElement('p');
+                    emailP.className = "oa-contact-email mui-h6";
+                    emailP.innerText = item.uEmail;
+                    tableCellDiv2.appendChild(emailP);
+                    tableDiv.appendChild(tableCellDiv2);
+                    var tableCellDiv3 = document.createElement('div');
+                    tableCellDiv3.className = 'oa-contact-right mui-table-cell';
+                    var checkBox = document.createElement('input');
+                    checkBox.name = item.uId;
+                    checkBox.type = "checkbox";
+                    checkBox.value = item.uNickname;
+                    tableCellDiv3.appendChild(checkBox);
+                    tableDiv.appendChild(tableCellDiv3);
+                    sliderDiv.appendChild(tableDiv);
+                    li.appendChild(sliderDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

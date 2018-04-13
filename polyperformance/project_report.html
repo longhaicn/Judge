@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <link rel="stylesheet" type="text/css" href="css/mui.picker.min.css"/>
+    <style>
+        html,
+        body {
+            background-color: #efeff4;
+        }
+
+        span.mui-icon {
+            font-size: 14px;
+            color: #007aff;
+            margin-left: -15px;
+            padding-right: 10px;
+        }
+
+        .mui-off-canvas-right {
+            color: #fff;
+        }
+
+        .title {
+            margin: 35px 15px 10px;
+        }
+
+        .title + .content {
+            margin: 10px 15px 35px;
+            color: #bbb;
+            text-indent: 1em;
+            font-size: 14px;
+            line-height: 24px;
+        }
+
+        .mui-h4 {
+            font-family: roman;
+            font-size: 15px;
+        }
+
+        #date-form .mui-h4 {
+            font-family: roman;
+            font-size: 15px;
+            color: black;
+        }
+
+        .mui-input {
+            width: 100%;
+            padding: 10px 0px;
+        }
+
+        .mui-input-row input {
+            width: 40%;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        .mui-button-row {
+            margin-top: 50px;
+            padding: 10px 5px;
+        }
+
+        #psId {
+            width: 100%;
+        }
+
+        input {
+            color: #000;
+        }
+
+        .award {
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<!--侧滑菜单容器-->
+<div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable mui-slide-in">
+    <!--菜单部分-->
+    <aside id="offCanvasSide" class="mui-off-canvas-right">
+        <header class="mui-bar mui-bar-nav">
+            <a id="cancel" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">取消</a>
+        </header>
+        <div id="offCanvasSideScroll" class="mui-scroll-wrapper" style="top: 46px;">
+            <div class="mui-scroll">
+                <div class="title">项目阶段</div>
+                <div class="content">
+                    <form id='date-form' class="mui-input-group">
+                        <div class="mui-input-row">
+                            <input id='psId' type="text" class="mui-input" readonly="readonly">
+                        </div>
+                        <div class="mui-input-row">
+                            <input id='psStart' type="text" readonly="readonly">
+                            <span>－</span>
+                            <input id='psEnd' type="text" readonly="readonly">
+                        </div>
+                    </form>
+                    <div class="mui-button-row">
+                        <button id='confirm' type="button" class="mui-btn mui-btn-primary">查询</button>&nbsp;&nbsp;
+                        <button id='download' type="button" class="mui-btn mui-btn-danger">下载</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <div class="mui-inner-wrap">
+        <header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+            <h1 id="project_title" class="mui-title"></h1>
+            <a id="filter" href="#offCanvasSide" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">筛选</a>
+        </header>
+        <div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <!--数据列表-->
+                <ul id="datalist" class="mui-table-view">
+                    <!--<li class="mui-table-view-cell">-->
+                        <!--<div class="mui-table">-->
+                            <!--<div class="mui-table-cell mui-col-xs-6">-->
+                                <!--<div class="mui-ellipsis mui-h4">邓辉</div>-->
+                                <!--<div class="mui-h5">项目总负责人</div>-->
+                            <!--</div>-->
+                            <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+                                <!--<div>-->
+                                    <!--<span class="mui-badge mui-badge-danger mui-text-left">86.55</span>-->
+                                <!--</div>-->
+                                <!--<div>-->
+                                    <!--<span class="award">奖金:</span>-->
+                                    <!--<span class="mui-badge mui-badge-primary mui-badge-inverted">25</span>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</li>-->
+                </ul>
+            </div>
+        </div>
+        <!-- off-canvas backdrop -->
+        <div class="mui-off-canvas-backdrop">
+        </div>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script type="text/javascript" src="js/mui.picker.min.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({});
+        //主界面和侧滑菜单界面均支持区域滚动；
+        mui('#offCanvasSideScroll').scroll();
+        mui('#pullrefresh').scroll();
+        mui.ready(function () {
+            var offCanvasWrapper = mui('#offCanvasWrapper');
+            var projectId = app.getUrlParam("projectId", window);
+            var projectName = app.getUrlParam("projectName", window);
+            var topLeaderId = app.getUrlParam("major", window);
+            var leaderId = app.getUrlParam("pUserId", window);
+            $('#project_title').text(projectName);
+            var psIdInput = document.getElementById('psId');
+            var psStartInput = document.getElementById('psStart');
+            var psEndInput = document.getElementById('psEnd');
+            var table = document.body.querySelector('.mui-table-view');
+            var nowDate = new Date();
+            var nowDateStr = app.datetimeFormat(nowDate, "yyyy-MM-dd");
+            var preDateStr = app.datetimeFormat((nowDate.getTime() - 7 * 24 * 3600 * 1000), "yyyy-MM-dd");
+            psStartInput.value = preDateStr;
+            psEndInput.value = nowDateStr;
+            var psIdPicker = new mui.PopPicker();
+            getProjectStageData();
+            getProjectReportData();
+            var picker = new mui.DtPicker({
+                type: "date"
+            });
+            psStartInput.addEventListener('tap', function () {
+                picker.show(function (rs) {
+                    $("#psStart").val(rs.text).change();
+                });
+            });
+
+            psEndInput.addEventListener('tap', function () {
+                picker.show(function (rs) {
+                    $("#psEnd").val(rs.text).change();
+                });
+            });
+
+            document.getElementById("confirm").addEventListener('tap', function (event) {
+                getProjectReportData();
+                offCanvasWrapper.offCanvas('close');
+            });
+
+            document.getElementById("download").addEventListener('tap', function (event) {
+                window.open(app.baseURL + "getXLS");
+            });
+
+            mui('#datalist').on('tap', 'li', function (e) {
+                var id = this.getAttribute('id');
+                var reportData = this.dataset.reportData;
+                mui.openWindow({
+                    url: 'project_report_detail.html?projectId='+ projectId + '&pUserId=' + leaderId + '&major=' + topLeaderId + '&' + app.parseParam($.parseJSON(reportData)),
+                    id: 'project_report_detail.html',
+                    show: {
+                        aniShow: 'pop-in'
+                    },
+                    styles: {
+                        popGesture: 'hide'
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+            });
+
+            function getProjectReportData() {
+                if (psStartInput.value && psEndInput.value) {
+                    app.getAllData({
+                        url: app.baseURL + "scorereport?projectId=" + projectId + "&start=" + psStartInput.value + "&end=" + psEndInput.value,
+                        type: 'GET',
+                        parseFn: app.parseFn,
+                        callback: function (a_record, a_code, a_desc) {
+                            switch (a_code) {
+                                case '0':
+                                    $(".mui-table-view").empty();
+                                    if(a_record.length === 0){
+                                        mui.toast("暂无记录!", {
+                                            duration: 'long',
+                                            type: 'div'
+                                        })
+                                    }else table.appendChild(createFragment(a_record));
+                                    break;
+                                default:
+                                    mui.toast(a_desc, {
+                                        duration: 'long',
+                                        type: 'div'
+                                    })
+                            }
+                        }
+                    });
+                } else {
+                    mui.toast("请选择时间段", {
+                        duration: 'long',
+                        type: 'div'
+                    });
+                }
+            }
+
+            function getProjectStageData() {
+                projectId && app.getAllData({
+                    url: app.baseURL + "selectProjectStageByProjectid?projectId=" + projectId,
+                    type: 'GET',
+                    parseFn: app.parseFn,
+                    callback: function (a_record, a_code) {
+                        if (a_record) {
+                            var projectStageData = [{
+                                value: "",
+                                text: "未选择",
+                                psStart: preDateStr,
+                                psEnd: nowDateStr
+                            }];
+                            $.each(a_record, function (index, item) {
+                                var stageObj = {
+                                    value: item.psId,
+                                    text: item.psStageDescription,
+                                    psStart: app.datetimeFormat(item.psStart, "yyyy-MM-dd"),
+                                    psEnd: app.datetimeFormat(item.psEnd, "yyyy-MM-dd")
+                                };
+                                projectStageData.push(stageObj);
+                            });
+                            psIdPicker.setData(projectStageData);
+                            psIdPicker.pickers[0].setSelectedIndex(0);
+                            psIdInput.addEventListener('tap', function (event) {
+                                psIdPicker.show(function (selectItems) {
+                                    var value = selectItems[0].value;
+                                    psIdInput.value = selectItems[0].text;
+                                    psStartInput.value = selectItems[0].psStart;
+                                    psEndInput.value = selectItems[0].psEnd;
+                                    if (value) {
+                                        $("#psStart").attr("disabled", "disabled");
+                                        $("#psEnd").attr("disabled", "disabled");
+                                    } else {
+                                        $("#psStart").removeAttr("disabled");
+                                        $("#psEnd").removeAttr("disabled");
+                                    }
+                                })
+                            });
+                        }
+                    }
+                });
+            }
+            document.getElementById('cancel').addEventListener('tap', function () {
+                offCanvasWrapper.offCanvas('close');
+            });
+
+            $("#psStart").change(function () {
+                var startDateString = $(this).val();
+                if (startDateString) {
+                    var psStartDate = new Date(startDateString);
+                    var psEndDate = new Date($('#psEnd').val());
+                    if (psStartDate >= psEndDate) {
+                        $(this).val("");
+                        mui.toast("开始时间 不能大于等于 结束时间!", {
+                            duration: 'long',
+                            type: 'div'
+                        });
+                    }
+                }
+            });
+
+            $("#psEnd").change(function () {
+                var endDateString = $(this).val();
+                if (endDateString) {
+                    var psEndDate = new Date(endDateString);
+                    var psStartDate = new Date($('#psStart').val());
+                    if (psStartDate >= psEndDate) {
+                        $(this).val("");
+                        mui.toast("结束时间 不能小于等于 开始时间!", {
+                            duration: 'long',
+                            type: 'div'
+                        });
+                    }
+                }
+            });
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    li.id = item.uId;
+                    li.dataset.reportData = JSON.stringify(item);
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'mui-table-cell mui-col-xs-6';
+                    var projectDiv = document.createElement('div');
+                    projectDiv.className = 'mui-ellipsis mui-h4';
+                    projectDiv.innerHTML = item.uUsername;
+                    tableCellDiv.appendChild(projectDiv);
+                    var dateDiv = document.createElement('div');
+                    dateDiv.className = 'mui-h5';
+                    dateDiv.innerHTML = item.uRole;
+                    tableCellDiv.appendChild(dateDiv);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'mui-table-cell mui-col-xs-6 mui-text-right';
+                    var sumDiv = document.createElement('div');
+                    var sumSpan = document.createElement('span');
+                    var totalSum = parseInt(item.evSum);
+                    if (totalSum >= 80) {
+                        sumSpan.className = 'mui-badge mui-badge-success mui-badge-inverted mui-text-left';
+                    } else if (totalSum >= 50) {
+                        sumSpan.className = 'mui-badge mui-badge-inverted mui-text-left';
+                    } else sumSpan.className = 'mui-badge mui-badge-danger mui-badge-inverted mui-text-left';
+                    sumSpan.innerHTML = totalSum+" 分";
+                    sumDiv.appendChild(sumSpan);
+                    tableCellDiv2.appendChild(sumDiv);
+                    var awardDiv = document.createElement('div');
+                    var award1Span = document.createElement('span');
+                    award1Span.className = 'award';
+                    award1Span.innerHTML = "奖金: ";
+                    awardDiv.appendChild(award1Span);
+                    var awardSpan = document.createElement('span');
+                    awardSpan.className = 'mui-badge mui-badge-primary mui-badge-inverted';
+                    awardSpan.innerHTML = item.uProportion;
+                    awardDiv.appendChild(awardSpan);
+                    tableCellDiv2.appendChild(awardDiv);
+                    tableDiv.appendChild(tableCellDiv2);
+                    li.appendChild(tableDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

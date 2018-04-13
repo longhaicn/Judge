@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <style>
+        html,
+        body {
+            background-color: #efeff4;
+        }
+
+        .mui-h4 {
+            font-family: roman;
+            font-size: 15px;
+        }
+
+        .mui-off-canvas-right {
+            color: #fff;
+        }
+
+        .leader {
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<!--侧滑菜单容器-->
+<div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable mui-scalable">
+    <!--菜单部分-->
+    <aside id="offCanvasSide" class="mui-off-canvas-right">
+        <div id="offCanvasSideScroll" class="mui-scroll-wrapper" style="top: 46px;">
+            <div class="mui-scroll">
+                <ul id="pending_score_list" class="mui-table-view mui-table-view-chevron mui-table-view-inverted">
+                    <li class="mui-table-view-cell">
+                        <a class="mui-navigate-right">
+                            待处理评分
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+    <div class="mui-inner-wrap">
+        <header class="mui-bar mui-bar-nav">
+            <h1 id="title" class="mui-title mui-action-back mui-text-center">参加的项目</h1>
+            <a id="setting" href="#offCanvasSide" class="mui-icon mui-icon-bars mui-pull-right"></a>
+        </header>
+        <div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <!--数据列表-->
+                <ul class="mui-table-view" id="project_list">
+                    <!--<li class="mui-table-view-cell">-->
+                    <!--<div class="mui-table">-->
+                    <!--<div class="mui-table-cell mui-col-xs-6">-->
+                    <!--<div class="mui-ellipsis mui-h4">NC项目</div>-->
+                    <!--<div class="mui-h5">2018-01-14－2018-06-20</div>-->
+                    <!--</div>-->
+                    <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+                    <!--<div>-->
+                    <!--<span class="mui-badge mui-badge-purple mui-text-left">不 紧</span>-->
+                    <!--</div>-->
+                    <!--<div>-->
+                    <!--<span class="leader">负责人:</span>-->
+                    <!--<span class="mui-badge mui-badge-primary mui-badge-inverted">林经</span>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                    <!--</li>-->
+                </ul>
+            </div>
+        </div>
+
+        <!-- off-canvas backdrop -->
+        <div class="mui-off-canvas-backdrop">
+        </div>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        var offCanvasWrapper = mui('#offCanvasWrapper');
+        //主界面和侧滑菜单界面均支持区域滚动；
+        mui('#offCanvasSideScroll').scroll();
+        mui('#pullrefresh').scroll();
+        mui.ready(function () {
+            var user = app.getUser();
+            var table = document.body.querySelector('#project_list');
+            app.getAllData({
+                url: app.baseURL + "selectProjectByOrguserID?uId=" + user.uId,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code, a_desc) {
+                    switch (a_code) {
+                        case '0':
+                            $("#project_list").empty();
+                            table.appendChild(createFragment(a_record));
+                            break;
+                        default:
+                            mui.toast(a_desc, {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                    }
+                }
+            });
+        });
+        mui('#project_list').on('tap', 'li', function (e) {
+            var id = this.getAttribute('id');
+            mui.openWindow({
+                url: 'project_detail.html?projectId=' + id,
+                id: 'project_detail.html',
+                show: {
+                    aniShow: 'pop-in'
+                },
+                styles: {
+                    popGesture: 'hide'
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+        });
+
+        mui('#pending_score_list').on('tap', 'li', function (e) {
+            //var id = this.getAttribute('id');
+            mui.openWindow({
+                url: 'project_pending_score.html',
+                id: 'project_pending_score.html',
+                show: {
+                    aniShow: 'pop-in'
+                },
+                styles: {
+                    popGesture: 'hide'
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+        });
+
+
+        function createFragment(a_record) {
+            var fragment = document.createDocumentFragment();
+            mui.each(a_record, function (index, item) {
+                var li = document.createElement('li');
+                li.className = 'mui-table-view-cell';
+                li.id = item.pId;
+                var tableDiv = document.createElement('div');
+                tableDiv.className = 'mui-table';
+                var tableCellDiv = document.createElement('div');
+                tableCellDiv.className = 'mui-table-cell mui-col-xs-6';
+                var projectDiv = document.createElement('div');
+                projectDiv.className = 'mui-ellipsis mui-h4';
+                projectDiv.innerHTML = item.pName;
+                tableCellDiv.appendChild(projectDiv);
+                var dateDiv = document.createElement('div');
+                dateDiv.className = 'mui-h5';
+                dateDiv.innerHTML = app.datetimeFormat(item.pStart, "yyyy-MM-dd") + ' / ' + app.datetimeFormat(item.pEnd, "yyyy-MM-dd");
+                tableCellDiv.appendChild(dateDiv);
+                tableDiv.appendChild(tableCellDiv);
+
+                var tableCellDiv2 = document.createElement('div');
+                tableCellDiv2.className = 'mui-table-cell mui-col-xs-6 mui-text-right';
+                var gradeDiv = document.createElement('div');
+                var gradeSpan = document.createElement('span');
+                var grade = item.pClass;
+                if (grade === 3) {
+                    gradeSpan.className = 'mui-badge mui-badge-danger mui-text-left';
+                } else if (grade === 2) {
+                    gradeSpan.className = 'mui-badge mui-badge-green mui-text-left';
+                } else gradeSpan.className = 'mui-badge mui-badge-purple mui-text-left';
+                gradeSpan.innerHTML = app.projectClass[grade];
+                gradeDiv.appendChild(gradeSpan);
+                tableCellDiv2.appendChild(gradeDiv);
+                var leaderDiv = document.createElement('div');
+                var leader1Span = document.createElement('span');
+                leader1Span.className = 'leader';
+                leader1Span.innerHTML = "总负责人:";
+                leaderDiv.appendChild(leader1Span);
+                var leaderSpan = document.createElement('span');
+                leaderSpan.className = 'mui-badge mui-badge-primary mui-badge-inverted';
+                leaderSpan.innerHTML = item.pUserName;
+                leaderDiv.appendChild(leaderSpan);
+                tableCellDiv2.appendChild(leaderDiv);
+                tableDiv.appendChild(tableCellDiv2);
+                li.appendChild(tableDiv);
+                fragment.appendChild(li);
+            });
+            return fragment;
+        }
+    }(mui, document));
+</script>
+</body>
+
+</html>

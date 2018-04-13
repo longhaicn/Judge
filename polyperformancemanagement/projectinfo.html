@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>项目信息</title>
+    <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome-4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="select2-develop/dist/css/select2.css">
+    <link rel="stylesheet" href="bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.min.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="select2-develop/dist/js/select2.js"></script>
+    <script type="text/javascript" src="bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"
+            charset="UTF-8"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/jquery.form.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/myApp.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 70px;
+        }
+    </style>
+    <script>
+        myApp.myUser = myApp.checkUser();
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="projectinfo.html">绩效管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="projectinfo.html">项目信息</a></li>
+                <li><a href="reportProject.html">项目报表</a></li>
+                <li><a href="reportMiss.html">未评分人报表</a></li>
+            </ul>
+            <ul id="setting" class="nav navbar-nav navbar-right">
+                <li><a href="password.html">更改密码</a></li>
+                <li class="navbar-right"><a href="index.html">安全退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="panel-body">
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default">
+            <span class="fa fa-plus" aria-hidden="true"></span> 新增
+        </button>
+    </div>
+    <table id="table"></table>
+</div>
+<div class="modal fade bs-example-modal-lg" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">项目详情</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <div hidden>
+                            <label for="pId" class="col-sm-2 control-label">项目编号:</label>
+
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" id="pId" name="pId" readonly>
+                            </div>
+                        </div>
+                        <label for="pName" class="col-sm-2 control-label">项目名称:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="pName" name="pName" required>
+                        </div>
+                        <label for="major" class="col-sm-2 control-label">最高负责人:</label>
+
+                        <div class="col-sm-4">
+                            <select class="form-control" id="major" name="major" required>
+                                <option value=""></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pUserId" class="col-sm-2 control-label">项目总负责人:</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" id="pUserId" name="pUserId" required>
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <label for="pUserPenalty" class="col-sm-2 control-label">处罚扣除奖金:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="pUserPenalty" name="pUserPenalty" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pDescription" class="col-sm-2 control-label">项目描述:</label>
+
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="pDescription" name="pDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pClass" class="col-sm-2 control-label">级别:</label>
+
+                        <div class="col-sm-4">
+                            <select class="form-control" id="pClass" name="pClass" required>
+                                <option value="1">三级优先</option>
+                                <option value="2">二级优先</option>
+                                <option value="3">一级优先</option>
+                            </select>
+                        </div>
+                        <label for="pAward" class="col-sm-2 control-label">奖金:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="pAward" name="pAward" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pStart" class="col-sm-2 control-label">开始时间:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="pStart" name="pStart"
+                                   data-date-format="yyyy-mm-dd">
+                        </div>
+                        <label for="pEnd" class="col-sm-2 control-label">结束时间:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="pEnd" name="pEnd" data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                    <div id="projectStageToolbar" class="btn-group" action="create">
+                        <button id="btn_add_stage" type="button" class="btn btn-default">
+                            <span class="fa fa-plus" aria-hidden="true"></span>新增
+                        </button>
+                        <button id="btn_del_stage" type="button" class="btn btn-default">
+                            <span class="fa fa-times" aria-hidden="true"></span>删除
+                        </button>
+                    </div>
+                    <table id="projectStageTable"></table>
+                    <div id="projectTeamToolbar" class="btn-group" action="create">
+                        <button id="btn_add_team" type="button" class="btn btn-default">
+                            <span class="fa fa-plus" aria-hidden="true"></span>新增
+                        </button>
+                        <button id="btn_del_team" type="button" class="btn btn-default">
+                            <span class="fa fa-times" aria-hidden="true"></span>删除
+                        </button>
+                    </div>
+                    <table id="projectTeamTable"></table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="create_data" type="button" class="btn btn-success" action="create">提交
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="stageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="stageModalLabel">项目阶段详情</h4>
+            </div>
+            <div class="modal-body">
+                <form id="stage-edit" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="psStage" class="col-sm-2 control-label">阶段编号:</label>
+
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="psStage" name="psStage">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="psStageDescription" class="col-sm-2 control-label">阶段描述:</label>
+
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="psStageDescription" name="psStageDescription" rows="2"
+                                      required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="psAward" class="col-sm-2 control-label">阶段奖金:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="psAward" name="psAward" required>
+                        </div>
+                        <label class="col-sm-2 control-label" id="psAwardMark" style="color: red">最多分配</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="psStart" class="col-sm-2 control-label">开始时间:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="psStart" name="psStart"
+                                   data-date-format="yyyy-mm-dd">
+                        </div>
+                        <label for="psEnd" class="col-sm-2 control-label">结束时间:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="psEnd" name="psEnd"
+                                   data-date-format="yyyy-mm-dd">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="create_stage_data" type="button" class="btn btn-success" action="create">创建
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bs-example-modal-lg" id="teamModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="teamModalLabel">参与成员信息</h4>
+            </div>
+            <div class="modal-body">
+                <form id="team-edit" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="uId" class="col-sm-2 control-label">成员姓名:</label>
+
+                        <div class="col-sm-4">
+                            <select class="form-control" id="uId" name="uId" required>
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <label for="uRole" class="col-sm-2 control-label">成员角色:</label>
+
+                        <div class="col-sm-4">
+                            <select class="form-control" id="uRole" name="uRole" required>
+                                <option value="3">执行负责人</option>
+                                <option value="4">员工</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="uPenalty" class="col-sm-2 control-label">处罚奖金:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="uPenalty" name="uPenalty" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="create_team_data" type="button" class="btn btn-success" action="create">添加
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#table').bootstrapTable({
+        toolbar: '#toolbar',                //工具按钮用哪个容器
+        search: true,                       //是否显示表格搜索，此搜索是客户端搜索
+        strictSearch: false,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        sortable: true,                    //设置为true启用所有列排序
+        sortName: "pId",
+        sortOrder: "asc",                   //排序方式
+        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+        pagination: true,                   //是否显示分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 15,                       //每页的记录行数（*）
+        pageList: [15, 25, 50, 100, 'All'],        //可供选择的每页的行数（*）
+        showColumns: true,                  //是否显示所有的列
+        showRefresh: true,                  //是否显示刷新按钮
+        minimumCountColumns: 4,             //最少允许的列数
+        clickToSelect: true,                //设置true 将在点击行时，自动选择rediobox 和 checkbox
+        maintainSelected: false,             //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        height: 713,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+        idField: "pId",
+        uniqueId: "pId",                     //每一行的唯一标识，一般为主键列
+        showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+        cardView: false,                    //是否显示详细视图
+        detailView: false,                   //是否显示父子表
+        columns: [{
+            field: 'state',
+            checkbox: true
+        }, {
+            field: 'pId',
+            title: '编号',
+            sortable: true
+        }, {
+            field: 'pName',
+            title: '项目名称',
+            sortable: true
+        }, {
+            field: 'pDescription',
+            title: '描述',
+            sortable: true,
+            width: "40%"
+        }, {
+            field: 'majorName',
+            title: '最高负责人',
+            sortable: true
+        }, {
+            field: 'pUserName',
+            title: '项目总负责人',
+            sortable: true
+        }, {
+            field: 'pUserPenalty',
+            title: '处罚扣除奖金',
+            sortable: true
+        }, {
+            field: 'datetime',
+            title: '发起时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }, {
+            field: 'pClass',
+            title: '级别',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.projectClass[key];
+            }
+        }, {
+            field: 'pAward',
+            title: '总奖金',
+            sortable: true
+        }, {
+            field: 'pStart',
+            title: '开始时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }, {
+            field: 'pEnd',
+            title: '结束时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }],
+        onDblClickRow: function (row, $element) {
+            showModal(myApp.action.LR, row);
+        },
+        onRefresh: function (params) {
+            getAllProjectData();
+        }
+    });
+    $('#projectStageTable').bootstrapTable({
+        toolbar: '#projectStageToolbar',
+        search: false,                       //是否显示表格搜索，此搜索是客户端搜索
+        strictSearch: false,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        sortable: true,                    //设置为true启用所有列排序
+        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+        pagination: true,                   //是否显示分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [15, 25, 50, 100, 'All'],        //可供选择的每页的行数（*）
+        showColumns: true,                  //是否显示所有的列
+        showRefresh: false,                  //是否显示刷新按钮
+        minimumCountColumns: 4,             //最少允许的列数
+        clickToSelect: true,                //设置true 将在点击行时，自动选择rediobox 和 checkbox
+        maintainSelected: false,             //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        height: 250,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+        idField: "psStage",
+        uniqueId: "psStage",
+        showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+        cardView: false,                    //是否显示详细视图
+        detailView: false,                   //是否显示父子表
+        columns: [{
+            field: 'state',
+            checkbox: true
+        }, {
+            field: 'psStage',
+            title: '项目阶段',
+            sortable: true
+        }, {
+            field: 'psStageDescription',
+            title: '阶段描述',
+            sortable: true
+        }, {
+            field: 'psAward',
+            title: '阶段奖金',
+            sortable: true
+        }, {
+            field: 'psStart',
+            title: '开始时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }, {
+            field: 'psEnd',
+            title: '结束时间',
+            sortable: true,
+            formatter: function (key, row, index) {
+                return myApp.Util.datetimeFormat(key);
+            }
+        }],
+        onRefresh: function (params) {
+            getProjectStageData();
+        }
+    });
+    $('#projectTeamTable').bootstrapTable({
+        toolbar: '#projectTeamToolbar',
+        search: false,                       //是否显示表格搜索，此搜索是客户端搜索
+        strictSearch: false,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        sortable: true,                    //设置为true启用所有列排序
+        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+        pagination: true,                   //是否显示分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [15, 25, 50, 100, 'All'],        //可供选择的每页的行数（*）
+        showColumns: true,                  //是否显示所有的列
+        showRefresh: false,                  //是否显示刷新按钮
+        minimumCountColumns: 4,             //最少允许的列数
+        clickToSelect: true,                //设置true 将在点击行时，自动选择rediobox 和 checkbox
+        maintainSelected: false,             //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        height: 250,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+        idField: "uId",
+        uniqueId: "uId",
+        showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+        cardView: false,                    //是否显示详细视图
+        detailView: false,                   //是否显示父子表
+        columns: [{
+            field: 'state',
+            checkbox: true
+        }, {
+            field: 'uNickname',
+            title: '成员姓名',
+            sortable: true
+        }, {
+            field: 'uRole',
+            title: '成员角色',
+            sortable: true,
+            formatter: function (key, row, index) {
+                var userRoleData = myApp.userRole;
+                return userRoleData[key];
+            }
+        }, {
+            field: 'uPenalty',
+            title: '处罚扣除奖金',
+            sortable: true
+        }],
+        onRefresh: function (params) {
+            getProjectTeamData();
+        }
+    });
+
+    function getAllProjectData() {
+        myApp.Util.getAllData({
+            url: myApp.baseURL + "selectAllProject",
+            type: 'GET',
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code, a_desc) {
+                a_record && $('#table').bootstrapTable("load", a_record);
+            }
+        });
+    }
+
+    $('#pStart').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true,
+        startDate: new Date()
+    });
+
+    $('#pEnd').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true,
+        startDate: new Date()
+    });
+
+    $('#psStart').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true,
+        startDate: new Date()
+    });
+
+    $('#psEnd').datetimepicker({
+        autoclose: true,
+        minView: 2,
+        todayBtn: true,
+        startDate: new Date()
+    });
+
+    getAllProjectData();
+
+    selectUser("#pUserId", "选择项目总负责人", "#dataModal");
+    selectUser("#major", "选择最高负责人", "#dataModal");
+    selectUser("#uId", "选择参与人员", "#teamModal");
+
+    function selectUser(elem, a_placeholder, modal) {
+        $(elem).select2({
+            ajax: {
+                type: 'GET',
+                url: myApp.baseURL + "searchuser",
+                dataType: 'json',
+                delay: 0,
+                data: function (params) {
+                    return {
+                        words: params.term, // search term 请求参数
+                        page: 1
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    var itemList = []; //当数据对象不是{id:0,text:'ANTS'}这种形式的时候，可以使用类似此方法创建新的数组对象
+                    $.each(data.data, function (index, element) {
+                        var itemObj = {
+                            id: element.uId,
+                            text: element.uNickname
+                        };
+                        itemList.push(itemObj);
+                    });
+                    return {
+                        results: itemList//itemList
+                        // pagination: {
+                        //     more: (params.page * 100) < 1000
+                        // }
+                    };
+                },
+                cache: true
+            },
+            width: "100%",
+            dropdownParent: $(modal),
+            placeholder: a_placeholder,//默认文字提示
+            language: "zh-CN",
+            tags: false,//允许手动添加
+            allowClear: false,//允许清空
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // 自定义格式化防止xss注入
+            minimumInputLength: 1,//最少输入多少个字符后开始查询
+            formatResult: function formatRepo(repo) {
+                return repo.text;
+            }, // 函数用来渲染结果
+            formatSelection: function formatRepoSelection(repo) {
+                return repo.text;
+            } // 函数用于呈现当前的选择
+        });
+    }
+
+    function getProjectStageData() {
+        var record = $('#form-edit').serializeObject();
+        record.pId && myApp.Util.getAllData({
+            url: myApp.baseURL + "selectProjectStageByProjectid?projectId=" + record.pId,
+            type: 'GET',
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                a_record && $('#projectStageTable').bootstrapTable("load", a_record);
+            }
+        });
+    }
+
+    function getProjectTeamData() {
+        var record = $('#form-edit').serializeObject();
+        record.pId && myApp.Util.getAllData({
+            url: myApp.baseURL + "searchUsersByproid?projectId=" + record.pId,
+            type: 'GET',
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                a_record && $('#projectTeamTable').bootstrapTable("load", a_record);
+            }
+        });
+    }
+
+    function showModal(action, row) {
+        if (row) {
+            var pstart = myApp.Util.datetimeFormat(row.pStart, "yyyy-MM-dd hh:mm:ss");
+            var pend = myApp.Util.datetimeFormat(row.pEnd, "yyyy-MM-dd hh:mm:ss");
+            row.pStart = pstart;
+            row.pEnd = pend;
+            $('#major').empty();
+            $('#major').append("<option value='" + row.major + "' selected>" + row.majorName + "</option>");
+            $('#pUserId').empty();
+            $('#pUserId').append("<option value='" + row.pUserId + "' selected>" + row.pUserName + "</option>");
+            $('#form-edit').setForm(row);
+        }
+        getProjectStageData();
+        getProjectTeamData();
+        var createItems = $("[action='create']");
+        if (action === myApp.action.LR) {
+            createItems.hide();
+        } else {
+            createItems.show();
+        }
+        $('#dataModal').modal();
+    }
+
+    function hideModal() {
+        $('#dataModal').modal('hide');
+    }
+
+    $("#major").change(function () {
+        if ($(this).val() && ($(this).val() === $('#pUserId').val())) {
+            myApp.Util.animateMessage('提示', '最高负责人 跟 项目总负责人 重复了!', 'error');
+            $(this).val(null).trigger("change");
+        }
+    });
+    $("#pUserId").change(function () {
+        if ($(this).val() && ($(this).val() === $('#major').val())) {
+            myApp.Util.animateMessage('提示', '项目总负责人 跟 最高负责人 重复了!', 'error');
+            $(this).val(null).trigger("change");
+        }
+    });
+
+    $("#pStart").change(function () {
+        var startDateString = $(this).val();
+        if (startDateString) {
+            var pStartDate = new Date(startDateString);
+            var pEndDate = new Date($('#pEnd').val());
+            if (pStartDate >= pEndDate) {
+                myApp.Util.animateMessage('提示', '开始时间 不能大于等于 结束时间!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+    $("#pEnd").change(function () {
+        var endDateString = $(this).val();
+        if (endDateString) {
+            var pEndDate = new Date(endDateString);
+            var pStartDate = new Date($('#pStart').val());
+            if (pStartDate >= pEndDate) {
+                myApp.Util.animateMessage('提示', '结束时间 不能小于等于 开始时间!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+    $("#psStart").change(function () {
+        var startDateString = $(this).val();
+        if (startDateString) {
+            var psStartDate = new Date(startDateString);
+            var psEndDate = new Date($('#psEnd').val());
+            var pStartDate = new Date($('#pStart').val());
+            var pEndDate = new Date($('#pEnd').val());
+            if (psStartDate >= pStartDate && psStartDate < pEndDate) {
+                if (psStartDate >= psEndDate) {
+                    myApp.Util.animateMessage('提示', '开始时间 不能大于等于 结束时间!', 'error');
+                    $(this).val("");
+                }
+            } else {
+                myApp.Util.animateMessage('提示', '开始时间 不在 项目开始时间 和 结束时间 内!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+    $("#psEnd").change(function () {
+        var endDateString = $(this).val();
+        if (endDateString) {
+            var psEndDate = new Date(endDateString);
+            var psStartDate = new Date($('#psStart').val());
+            var pStartDate = new Date($('#pStart').val());
+            var pEndDate = new Date($('#pEnd').val());
+            if (psEndDate > pStartDate && psEndDate <= pEndDate) {
+                if (psStartDate >= psEndDate) {
+                    myApp.Util.animateMessage('提示', '结束时间 不能小于等于 开始时间!', 'error');
+                    $(this).val("");
+                }
+            } else {
+                myApp.Util.animateMessage('提示', '结束时间 不在 项目开始时间 和 结束时间 内!', 'error');
+                $(this).val("");
+            }
+        }
+    });
+
+
+    $('#btn_add').click(function () {
+        $('#form-edit')[0].reset();
+        $('#major').val(null).trigger("change");
+        $('#pUserId').val(null).trigger("change");
+        $('#projectStageTable').bootstrapTable('removeAll');
+        $('#projectTeamTable').bootstrapTable('removeAll');
+        showModal(myApp.action.CR);
+    });
+    $('#btn_add_stage').click(function () {
+        var projectAward = $('#pAward').val();
+        var pStartString = $('#pStart').val();
+        var pEndString = $('#pEnd').val();
+        if (projectAward && pStartString && pEndString) {
+            $('#stage-edit')[0].reset();
+            var projectStageData = $('#projectStageTable').bootstrapTable('getData');
+            var totalStageAward = 0;
+            var totalAward = parseInt(projectAward);
+            $.each(projectStageData, function (index, element) {
+                totalStageAward = totalStageAward + parseInt(element.psAward);
+            });
+            $('#psAwardMark').html("最多可分配" + (totalAward - totalStageAward));
+            $('#stageModal').modal();
+        } else myApp.Util.animateMessage('提示', '请补全项目信息!', 'error');
+    });
+    $('#btn_del_stage').click(function () {
+        var selectItem = $('#projectStageTable').bootstrapTable('getSelections');
+        if (selectItem.length > 0) {
+            swal({
+                title: '温馨提示',
+                text: '确定删除吗？',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '确定删除！',
+                cancelButtonText: '取消'
+            }).then(function (isConfirm) {
+                if (isConfirm === true) {
+                    var vals = [];
+                    $.each(selectItem, function (index, element) {
+                        vals.push(element.psStage);
+                    });
+                    $('#projectStageTable').bootstrapTable('remove', {field: 'psStage', values: vals});
+                }
+            });
+        } else {
+            myApp.Util.animateMessage('提示!', '请选择数据!');
+        }
+    });
+    $('#create_stage_data').click(function () {
+        var record = $('#stage-edit').serializeObject();
+        var stageFlag = 1;
+        var psStage = record.psStage;
+        var curStageAward = parseInt(record.psAward);
+        record.psStageDescription = "第" + psStage + "阶段:" + record.psStageDescription;
+        var projectStageData = $('#projectStageTable').bootstrapTable('getData');
+        var totalStageAward = 0;
+        var totalAward = parseInt($('#pAward').val());
+        $.each(projectStageData, function (index, element) {
+            if (element.psStage === psStage) {
+                stageFlag = 0;
+                myApp.Util.animateMessage('提示', '阶段编号不能重复!', 'error');
+                return false;
+            }
+            totalStageAward = totalStageAward + parseInt(element.psAward);
+        });
+        if (stageFlag) {
+            if (curStageAward <= (totalAward - totalStageAward)) {
+                $('#projectStageTable').bootstrapTable('append', record);
+                $('#stageModal').modal('hide');
+            } else myApp.Util.animateMessage('提示', '阶段奖金超限了!', 'error');
+        }
+    });
+    $('#btn_add_team').click(function () {
+        $('#team-edit')[0].reset();
+        $('#uId').val(null).trigger("change");
+        $('#teamModal').modal();
+    });
+    $('#btn_del_team').click(function () {
+        var selectItem = $('#projectTeamTable').bootstrapTable('getSelections');
+        if (selectItem.length > 0) {
+            swal({
+                title: '温馨提示',
+                text: '确定删除吗？',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '确定删除！',
+                cancelButtonText: '取消'
+            }).then(function (isConfirm) {
+                if (isConfirm === true) {
+                    var vals = [];
+                    $.each(selectItem, function (index, element) {
+                        vals.push(element.uId);
+                    });
+                    $('#projectTeamTable').bootstrapTable('remove', {field: 'uId', values: vals});
+                }
+            });
+        } else {
+            myApp.Util.animateMessage('提示!', '请选择数据!');
+        }
+    });
+    $('#create_team_data').click(function () {
+        var record = $('#team-edit').serializeObject();
+        if (record.uId != $('#pUserId').val() || record.uId != $('#major').val()) {
+            var user = $('#uId').select2("data");
+            record.uNickname = user[0].text;
+            $('#projectTeamTable').bootstrapTable('append', record);
+            $('#teamModal').modal('hide');
+        } else {
+            myApp.Util.animateMessage('提示', '无需添加 项目总负责人 或 最高负责人!', 'error');
+        }
+    });
+    $('#create_data').click(function () {
+        var record = $('#form-edit').serializeObject();
+        var stageData = $('#projectStageTable').bootstrapTable('getData');
+        var userData = $('#projectTeamTable').bootstrapTable('getData');
+        var leader = $('#pUserId').select2("data");
+        var inspector = $('#major').select2("data");
+        record.pUserName = leader[0].text;
+        record.majorName = inspector[0].text;
+        record.stages = stageData;
+        record.users = userData;
+        myApp.Util.getObj({
+            url: myApp.baseURL + "insertProject",
+            data: {
+                data: JSON.stringify(record)
+            },
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                switch (a_code) {
+                    case '0':
+                        $('#table').bootstrapTable('refresh');
+                        hideModal();
+                        myApp.Util.animateMessage('新增', '操作成功!', 'success');
+                        break;
+                    default:
+                        myApp.Util.basicAlert("新增失败!");
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

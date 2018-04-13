@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <link href="css/style.css" rel="stylesheet"/>
+    <link href="raty-2.8.0/lib/jquery.raty.css" rel="stylesheet"/>
+    <style>
+        .mui-scroll-wrapper {
+            top: 46px;
+        }
+
+        .oa-contact-cell.mui-table .mui-table-cell {
+            padding: 11px 0;
+            vertical-align: middle;
+        }
+
+        .oa-contact-cell {
+            position: relative;
+            margin: -11px 0;
+        }
+
+        .oa-contact-avatar {
+            width: 75px;
+        }
+
+        .oa-contact-avatar img {
+            border-radius: 50%;
+        }
+
+        .oa-contact-content {
+            width: 100%;
+        }
+
+        .oa-contact-name {
+            margin-right: 20px;
+        }
+
+        .oa-contact-name,
+        .oa-contact-position {
+            float: left;
+        }
+
+        textarea {
+            margin-top: 5px;
+            margin-bottom: 0px;
+        }
+
+        .mui-input-row {
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 id="title" class="mui-title mui-action-back mui-text-center">团队评分</h1>
+    <a id="confirm" class="mui-btn mui-btn-blue mui-btn-link mui-pull-right">提交</a>
+</header>
+<div id="scrollWrapper" class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+            <!--<li class="mui-table-view-cell">-->
+            <!--<div class="mui-slider-cell">-->
+            <!--<div class="oa-contact-cell mui-table">-->
+            <!--<div class="oa-contact-avatar mui-table-cell">-->
+            <!--<img src="images/60x60.gif"/>-->
+            <!--</div>-->
+            <!--<div class="oa-contact-content mui-table-cell">-->
+            <!--<div class="mui-clearfix">-->
+            <!--<h4 class="oa-contact-name">叶文洁</h4>-->
+            <!--<span class="oa-contact-position mui-h6">审计部</span>-->
+            <!--</div>-->
+            <!--<p class="oa-contact-email mui-h6">-->
+            <!--yewenjie@sina.com-->
+            <!--</p>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="oa-contact-cell mui-table">-->
+            <!--<div class="oa-contact-content mui-table-cell">-->
+            <!--<div class="mui-clearfix mui-input-row">-->
+            <!--<span class="mui-h4" style="padding-bottom: 10px">工作态度: </span><span id="star88"></span><span id="hint88"></span>分-->
+            <!--</div>-->
+            <!--<div class="mui-clearfix mui-input-row">-->
+            <!--<span class="mui-h4">工作效率: </span><span id="star1"></span><span id="hint1"></span>分-->
+            <!--</div>-->
+            <!--<div class="mui-clearfix mui-input-row">-->
+            <!--<span class="mui-h4">目标完成性: </span><span id="star2"></span><span id="hint2"></span>分-->
+            <!--</div>-->
+            <!--<textarea rows="3" placeholder="差评理由"></textarea>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+<script src="js/mui.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="raty-2.8.0/lib/jquery.raty.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        //主界面和侧滑菜单界面均支持区域滚动；
+        mui('.mui-scroll-wrapper').scroll();
+        mui.ready(function () {
+            var userData = [];
+            var startNum = 0;
+            var aId = app.getUrlParam("aId", window);
+            var jProjectId = app.getUrlParam("jProjectId", window);
+            var table = document.body.querySelector('.mui-table-view');
+            var user = app.getUser();
+            app.getAllData({
+                url: app.baseURL + "selectUsersForJudge?aId=" + aId + "&uId=" + user.uId,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code, a_desc) {
+                    switch (a_code) {
+                        case '0':
+                            table.appendChild(createFragment(a_record));
+                            $("textarea").hide();
+                            showStartScore(userData);
+                            break;
+                        default:
+                            mui.toast(a_desc, {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                    }
+                }
+            });
+
+            function showStartScore(userData) {
+                mui.each(userData, function (index, item) {
+                    var startId = item.startId;
+                    var scoreId = item.scoreId;
+                    $("#" + startId).raty({
+                        target: "#" + scoreId,
+                        click: function (score, evt) {
+                            var scoreId = this.name;
+                            var atitudescore = $("#atitudescore_" + scoreId).html();
+                            var efficientscore = $("#efficientscore_" + scoreId).html();
+                            var complishmentscore = $("#complishmentscore_" + scoreId).html();
+                            if (atitudescore === "0" || efficientscore === "0" || complishmentscore === "0") {
+                                $('#reason_' + scoreId).show();
+                            } else {
+                                $('#reason_' + scoreId).val("");
+                                $('#reason_' + scoreId).hide();
+                            }
+                            // if((score -1) === 0){
+                            //     $('#reason_'+scoreId).show();
+                            // }else {
+                            //     $('#reason_'+scoreId).val("");
+                            //     $('#reason_'+scoreId).hide();
+                            // }
+                        }
+                    });
+                });
+            }
+
+            document.getElementById("confirm").addEventListener('tap', function (event) {
+                if (startNum === 0) {
+                    var liCmp = $('li');
+                    var jsonData = [];
+                    var reasonCmp = $("textarea");
+                    var isNotRequired = 1;
+                    mui.each(reasonCmp, function (index, item) {
+                        var cmp = $('#' + item.id);
+                        if (!cmp.is(":hidden") && cmp.val() === "") {
+                            isNotRequired = 0;
+                            return false;
+                        }
+                    });
+                    if (isNotRequired) {
+                        mui.each(liCmp, function (index, item) {
+                            var jEvaluatedId = item.id;
+                            var jAtitude = $("#atitudescore_" + jEvaluatedId).html();
+                            var jQualityEfficient = $("#efficientscore_" + jEvaluatedId).html();
+                            var jComplishment = $("#complishmentscore_" + jEvaluatedId).html();
+                            if (jAtitude && jQualityEfficient && jComplishment) {
+                                var jsonObj = {
+                                    jAffairId: aId,
+                                    jProjectId: jProjectId,
+                                    jEvaluatorRoleId: 1,
+                                    jEvaluatorId: user.uId,
+                                    jEvaluatedId: jEvaluatedId,
+                                    jAtitude: jAtitude,
+                                    jQualityEfficient: jQualityEfficient,
+                                    jComplishment: jComplishment,
+                                    jReason: $("#reason_" + jEvaluatedId).val()
+                                };
+                                jsonData.push(jsonObj);
+                            } else {
+                                isNotRequired = 0;
+                                return false;
+                            }
+                        });
+                        if (isNotRequired) {
+                            startNum = 1;
+                            app.getObj({
+                                url: app.baseURL + "newJudge",
+                                data: {
+                                    data: JSON.stringify(jsonData)
+                                },
+                                parseFn: app.parseFn,
+                                callback: function (a_record, a_code, a_desc) {
+                                    switch (a_code) {
+                                        case '0':
+                                            mui.back();
+                                            break;
+                                        default:
+                                            startNum = 0;
+                                            mui.toast(a_desc, {
+                                                duration: 'long',
+                                                type: 'div'
+                                            })
+                                    }
+                                }
+                            });
+                        } else {
+                            mui.toast("请评分!", {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                        }
+                    } else mui.toast("请填写差评理由!", {
+                        duration: 'long',
+                        type: 'div'
+                    })
+                }
+            });
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    li.id = item.uId;
+                    var sliderDiv = document.createElement('div');
+                    sliderDiv.className = 'mui-slider-cell';
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'oa-contact-cell mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'oa-contact-avatar mui-table-cell';
+                    var userImg = document.createElement('img');
+                    userImg.src = "images/default_person.png";
+                    tableCellDiv.appendChild(userImg);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'oa-contact-content mui-table-cell';
+                    var userDiv = document.createElement('div');
+                    userDiv.className = "mui-clearfix";
+                    var userH = document.createElement('h4');
+                    userH.className = "oa-contact-name";
+                    userH.innerText = item.uNickname;
+                    var userSpan = document.createElement('span');
+                    userSpan.className = "oa-contact-position mui-h6";
+                    userSpan.innerText = item.uDepartment;
+                    userDiv.appendChild(userH);
+                    userDiv.appendChild(userSpan);
+                    tableCellDiv2.appendChild(userDiv);
+                    var emailP = document.createElement('p');
+                    emailP.className = "oa-contact-email mui-h6";
+                    emailP.innerText = item.uEmail;
+                    tableCellDiv2.appendChild(emailP);
+                    tableDiv.appendChild(tableCellDiv2);
+
+                    var tableDiv2 = document.createElement('div');
+                    tableDiv2.className = 'oa-contact-cell mui-table';
+                    var tableCellDiv3 = document.createElement('div');
+                    tableCellDiv3.className = 'oa-contact-content mui-table-cell';
+
+                    var atitudeDiv = document.createElement('div');
+                    atitudeDiv.className = 'mui-clearfix mui-input-row';
+                    var atitudeSpan = document.createElement('span');
+                    atitudeSpan.className = "mui-h4";
+                    atitudeSpan.innerText = "工作态度: ";
+                    var atitudeStartSpan = document.createElement('span');
+                    atitudeStartSpan.id = "atitudestart_" + item.uId;
+                    atitudeStartSpan.name = item.uId;
+                    var atitudeScoreSpan = document.createElement('span');
+                    atitudeScoreSpan.id = "atitudescore_" + item.uId;
+                    var atitudeObj = {};
+                    atitudeObj.startId = "atitudestart_" + item.uId;
+                    atitudeObj.scoreId = "atitudescore_" + item.uId;
+                    userData.push(atitudeObj);
+                    var atitudeScoreMarkSpan = document.createElement('span');
+                    atitudeScoreMarkSpan.className = "mui-h4";
+                    atitudeScoreMarkSpan.innerText = "分";
+                    atitudeDiv.appendChild(atitudeSpan);
+                    atitudeDiv.appendChild(atitudeStartSpan);
+                    atitudeDiv.appendChild(atitudeScoreSpan);
+                    atitudeDiv.appendChild(atitudeScoreMarkSpan);
+                    tableCellDiv3.appendChild(atitudeDiv);
+
+                    var efficientDiv = document.createElement('div');
+                    efficientDiv.className = 'mui-clearfix mui-input-row';
+                    var efficientSpan = document.createElement('span');
+                    efficientSpan.className = "mui-h4";
+                    efficientSpan.innerText = "工作效率和质量: ";
+                    var efficientStartSpan = document.createElement('span');
+                    efficientStartSpan.id = "efficientstart_" + item.uId;
+                    efficientStartSpan.name = item.uId;
+                    var efficientScoreSpan = document.createElement('span');
+                    efficientScoreSpan.id = "efficientscore_" + item.uId;
+                    var efficientObj = {};
+                    efficientObj.startId = "efficientstart_" + item.uId;
+                    efficientObj.scoreId = "efficientscore_" + item.uId;
+                    userData.push(efficientObj);
+                    var efficientScoreMarkSpan = document.createElement('span');
+                    efficientScoreMarkSpan.className = "mui-h4";
+                    efficientScoreMarkSpan.innerText = "分";
+                    efficientDiv.appendChild(efficientSpan);
+                    efficientDiv.appendChild(efficientStartSpan);
+                    efficientDiv.appendChild(efficientScoreSpan);
+                    efficientDiv.appendChild(efficientScoreMarkSpan);
+                    tableCellDiv3.appendChild(efficientDiv);
+
+                    var complishmentDiv = document.createElement('div');
+                    complishmentDiv.className = 'mui-clearfix mui-input-row';
+                    var complishmentSpan = document.createElement('span');
+                    complishmentSpan.className = "mui-h4";
+                    complishmentSpan.innerText = "目标完成性: ";
+                    var complishmentStartSpan = document.createElement('span');
+                    complishmentStartSpan.id = "complishmentstart_" + item.uId;
+                    complishmentStartSpan.name = item.uId;
+                    var complishmentScoreSpan = document.createElement('span');
+                    complishmentScoreSpan.id = "complishmentscore_" + item.uId;
+                    var complishmentObj = {};
+                    complishmentObj.startId = "complishmentstart_" + item.uId;
+                    complishmentObj.scoreId = "complishmentscore_" + item.uId;
+                    userData.push(complishmentObj);
+                    var complishmentScoreMarkSpan = document.createElement('span');
+                    complishmentScoreMarkSpan.className = "mui-h4";
+                    complishmentScoreMarkSpan.innerText = "分";
+                    complishmentDiv.appendChild(complishmentSpan);
+                    complishmentDiv.appendChild(complishmentStartSpan);
+                    complishmentDiv.appendChild(complishmentScoreSpan);
+                    complishmentDiv.appendChild(complishmentScoreMarkSpan);
+                    tableCellDiv3.appendChild(complishmentDiv);
+
+                    var reasonDiv = document.createElement('div');
+                    reasonDiv.className = 'mui-clearfix';
+                    var reasonTextarea = document.createElement('textarea');
+                    reasonTextarea.id = "reason_" + item.uId;
+                    reasonTextarea.rows = "3";
+                    reasonTextarea.placeholder = "差评理由";
+                    reasonDiv.appendChild(reasonTextarea);
+                    tableCellDiv3.appendChild(reasonDiv);
+                    tableDiv2.appendChild(tableCellDiv3);
+
+                    sliderDiv.appendChild(tableDiv);
+                    sliderDiv.appendChild(tableDiv2);
+                    li.appendChild(sliderDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

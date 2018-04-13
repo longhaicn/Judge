@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>帐号管理</title>
+    <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome-4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="js/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/animate.css">
+
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.min.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-table/bootstrap-table.js"></script>
+    <script src="js/bootstrap-table/locale/bootstrap-table-zh-CN.js"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <script src="js/jquery.md5.js"></script>
+    <script src="js/myApp.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 70px;
+        }
+    </style>
+    <script>
+        myApp.myUser = myApp.getUser();
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="projectinfo.html">商品管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="projectinfo.html">商品库存管理</a></li>
+                <li><a href="report.html">分类管理</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">采购信息 <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="purchaselist.html">采购清单</a></li>
+                        <li><a href="purchasehistory.html">采购纪录</a></li>
+                    </ul>
+                </li>
+                <li><a href="supplierinfo.html">供应商管理</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="active" jurisdiction="1"><a href="accountmanage.html">帐号管理</a></li>
+                <li class="navbar-right"><a href="index.html">安全退出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="panel-body">
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" jurisdiction="1" type="button" class="btn btn-default">
+            <span class="fa fa-plus" aria-hidden="true"></span>新增
+        </button>
+        <button id="btn_edit" jurisdiction="1" type="button" class="btn btn-default">
+            <span class="fa fa-pencil-square-o" aria-hidden="true"></span>修改
+        </button>
+        <button id="btn_delete" jurisdiction="1" type="button" class="btn btn-default">
+            <span class="fa fa-times" aria-hidden="true"></span>删除
+        </button>
+    </div>
+    <table id="table"></table>
+</div>
+<div class="modal fade bs-example-modal-lg" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">帐号详情</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit" class="form-horizontal" role="form">
+                    <div class="form-group" action="edit">
+                        <label for="id" class="col-sm-2 control-label">编号:</label>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="id" name="id" readonly>
+                        </div>
+                        <label for="status" class="col-sm-2 control-label">状态:</label>
+
+                        <div class="col-sm-4">
+                            <select class="form-control" id="status" name="status" required>
+                                <option value="1">有效</option>
+                                <option value="2">无效</option>
+                                <option value="3">冻结</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="account" class="col-sm-2 control-label">帐号:</label>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="account" name="account" readonly>
+                        </div>
+                        <label for="password" class="col-sm-2 control-label">密码:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="password" name="password" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="grade" class="col-sm-2 control-label">权限等级:</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="grade" name="grade" required>
+                                <option value="1">全部权限</option>
+                                <option value="2">只可新增编辑查看</option>
+                                <option value="3">只可查看</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" action="edit">
+                        <label for="signup" class="col-sm-2 control-label">注册时间:</label>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="signup" name="signup" readonly>
+                        </div>
+                        <label for="lastsignin" class="col-sm-2 control-label">最近登陆时间:</label>
+
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="lastsignin" name="lastsignin" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="reset_password" type="button" class="btn btn-primary" jurisdiction="1" style="float: left" action="edit">密码重置</button>
+                <button id="create_data" type="button" class="btn btn-success"  jurisdiction="1" action="create">新增</button>
+                <button id="update_data" type="button" class="btn btn-warning"  jurisdiction="1" action="edit">更新</button>
+                <button id="delete_data" type="button" class="btn btn-danger"  jurisdiction="1" action="edit">删除</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if(myApp.myUser.grade == 2){
+        $("[jurisdiction='1']").hide();
+    }else if(myApp.myUser.grade == 3){
+        $("[jurisdiction='1']").hide();
+        $("[jurisdiction='2']").hide();
+    }
+    $('#table').bootstrapTable({
+        toolbar: '#toolbar',                //工具按钮用哪个容器
+        search: true,                       //是否显示表格搜索，此搜索是客户端搜索
+        strictSearch: false,                 //设置为 true启用 全匹配搜索，否则为模糊搜索
+        striped: true,                      //是否显示行间隔色
+        cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+        sortable: true,                    //设置为true启用所有列排序
+        sortName: "id",
+        sortOrder: "asc",                   //排序方式
+        sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+        pagination: true,                   //是否显示分页（*）
+        pageNumber: 1,                       //初始化加载第一页，默认第一页
+        pageSize: 10,                       //每页的记录行数（*）
+        pageList: [15, 25, 50, 100, 'All'],        //可供选择的每页的行数（*）
+        showColumns: true,                  //是否显示所有的列
+        showRefresh: true,                  //是否显示刷新按钮
+        minimumCountColumns: 4,             //最少允许的列数
+        clickToSelect: true,                //设置true 将在点击行时，自动选择rediobox 和 checkbox
+        maintainSelected: false,             //设置为 true 在点击分页按钮或搜索按钮时，将记住checkbox的选择项
+        height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+        idField: "id",
+        uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+        showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+        cardView: false,                    //是否显示详细视图
+        detailView: false,                   //是否显示父子表
+        columns: [{
+            field: 'state',
+            checkbox: true
+        }, {
+            field: 'id',
+            title: '编号',
+            sortable: true
+        }, {
+            field: 'status',
+            title: '状态',
+            sortable: true,
+            formatter: function (key, row, index) {
+                if(key == 1){
+                    return "有效"
+                }else if(key == 2){
+                    return "无效";
+                }else{
+                    return "冻结";
+                }
+            }
+        }, {
+            field: 'account',
+            title: '帐号',
+            sortable: true
+        }, {
+            field: 'grade',
+            title: '权限等级',
+            sortable: true,
+            formatter: function (key, row, index) {
+                if(key == 1){
+                    return "全部权限"
+                }else if(key == 2){
+                    return "只可新增编辑查看";
+                }else{
+                    return "只可查看";
+                }
+            }
+        }, {
+            field: 'signup',
+            title: '注册时间',
+            sortable: true
+        }, {
+            field: 'lastsignin',
+            title: '最近登陆时间',
+            sortable: true
+        }],
+        onDblClickRow: function (row, $element) {
+            showModal(myApp.action.ER, row);
+        },
+        onRefresh: function (params) {
+            getNewAllData();
+        }
+    });
+    function getNewAllData() {
+        myApp.myUser = myApp.getUser();
+        myApp.myUser && myApp.Util.getAllData({
+            url: myApp.baseURL + "account/all",
+            data: {
+                account: myApp.myUser.account,
+                token: myApp.myUser.token,
+                json: {}
+            },
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                a_code && $('#table').bootstrapTable("load", a_record);
+            }
+        });
+    }
+    getNewAllData();
+    function showModal(action, row) {
+        var editItems = $("[action='edit']");
+        var createItems = $("[action='create']");
+        if (action == myApp.action.ER) {
+            editItems.show();
+            createItems.hide();
+            $('#account')[0].setAttribute("readonly", "readonly");
+            $('#password')[0].setAttribute("readonly", "readonly");
+        } else {
+            editItems.hide();
+            createItems.show();
+            $('#account')[0].removeAttribute("readonly");
+            $('#password')[0].removeAttribute("readonly");
+        }
+        if(myApp.myUser.grade == 2){
+            $("[jurisdiction='1']").hide();
+        }else if(myApp.myUser.grade == 3){
+            $("[jurisdiction='1']").hide();
+            $("[jurisdiction='2']").hide();
+        }
+        row && $('#form-edit').setForm(row);
+        $('#dataModal').modal();
+    }
+    function hideModal() {
+        $('#dataModal').modal('hide');
+    }
+    $('#btn_edit').click(function () {
+        var selectItem = $('#table').bootstrapTable('getSelections');
+        if (selectItem.length == 1) {
+            showModal(myApp.action.ER, selectItem[0]);
+        } else {
+            myApp.Util.animateMessage('提示!', '请选择数据且只能选择一行进行编辑!');
+        }
+    });
+    $('#update_data').click(function () {
+        var record = $('#form-edit').serializeObject();
+        myApp.myUser = myApp.getUser();
+        myApp.myUser && myApp.Util.getObj({
+            url: myApp.baseURL + "account/update",
+            data: {
+                account: myApp.myUser.account,
+                token: myApp.myUser.token,
+                json: JSON.stringify(record)
+            },
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                switch (a_code) {
+                    case '103':
+                        getNewAllData();
+                        hideModal();
+                        myApp.Util.animateMessage('更新', '操作成功!', 'success');
+                        break;
+                    default:
+                        myApp.Util.basicAlert("更新失败!");
+                }
+            }
+        });
+    });
+    $('#btn_add').click(function () {
+        $('#form-edit')[0].reset();
+        showModal(myApp.action.CR);
+    });
+    $('#create_data').click(function () {
+        var record = $('#form-edit').serializeObject();
+        record.password = $.md5(record.password);
+        myApp.myUser = myApp.getUser();
+        myApp.myUser && myApp.Util.getObj({
+            url: myApp.baseURL + "account/signup",
+            data: {
+                account: myApp.myUser.account,
+                token: myApp.myUser.token,
+                json: JSON.stringify(record)
+            },
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code) {
+                switch (a_code) {
+                    case '207':
+                        getNewAllData();
+                        hideModal();
+                        myApp.Util.animateMessage('新增', '操作成功!', 'success');
+                        break;
+                    default:
+                        myApp.Util.basicAlert("新增失败!");
+                }
+            }
+        });
+    });
+    $('#btn_delete').click(function () {
+        myApp.myUser = myApp.getUser();
+        if(myApp.myUser){
+            var selectItem = $('#table').bootstrapTable('getSelections');
+            if (selectItem.length == 1) {
+                swal({
+                    title: '你确定吗？',
+                    text: "这些数据将彻底删除!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '是'
+                }).then(function () {
+                    myApp.Util.getObj({
+                        url: myApp.baseURL + "account/del",
+                        data: {
+                            account: myApp.myUser.account,
+                            token: myApp.myUser.token,
+                            json: JSON.stringify(selectItem[0])
+                        },
+                        parseFn: myApp.Util.parseFn,
+                        callback: function (a_record, a_code) {
+                            switch (a_code) {
+                                case '107':
+                                    getNewAllData();
+                                    myApp.Util.animateMessage('删除', '删除成功!', 'success');
+                                    break;
+                                default:
+                                    myApp.Util.basicAlert("删除失败!");
+                            }
+                        }
+                    });
+                })
+            } else {
+                myApp.Util.animateMessage('提示!', '请选择一个帐号!');
+            }
+        }
+    });
+    $('#delete_data').click(function () {
+        myApp.myUser = myApp.getUser();
+        myApp.myUser && swal({
+            title: '你确定吗？',
+            text: "该数据将彻底删除!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '是'
+        }).then(function () {
+            var record = $('#form-edit').serializeObject();
+            myApp.Util.getObj({
+                url: myApp.baseURL + "account/del",
+                data: {
+                    account: myApp.myUser.account,
+                    token: myApp.myUser.token,
+                    json: JSON.stringify(record)
+                },
+                parseFn: myApp.Util.parseFn,
+                callback: function (a_record, a_code) {
+                    switch (a_code) {
+                        case '107':
+                            getNewAllData();
+                            hideModal();
+                            myApp.Util.animateMessage('删除', '删除成功', 'success');
+                            break;
+                        default:
+                            myApp.Util.basicAlert("删除失败!");
+                    }
+                }
+            });
+        })
+    });
+    $('#reset_password').click(function () {
+        hideModal();
+        swal({
+            title: '密码重置!',
+            input: 'text',
+            showCancelButton: true,
+            inputValidator: function (value) {
+                return new Promise(function (resolve, reject) {
+                    if (value) {
+                        resolve()
+                    } else {
+                        reject('请输入新密码!')
+                    }
+                })
+            }
+        }).then(function (result) {
+            $('#password').val($.md5(result));
+            $('#update_data').trigger("click");
+        });
+    });
+</script>
+</body>
+</html>

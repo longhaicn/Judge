@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="ui-page-login">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title></title>
+    <link href="css/mui.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <style>
+        .area {
+            margin: 20px auto 0px auto;
+        }
+
+        .mui-input-group {
+            margin-top: 10px;
+        }
+
+        .mui-input-group:first-child {
+            margin-top: 20px;
+        }
+
+        .mui-input-row label {
+            width: 50%;
+        }
+
+        .mui-input-row label ~ input {
+            width: 50%;
+        }
+
+        #topPopover {
+            position: fixed;
+            top: 16px;
+            right: 6px;
+        }
+
+        .mui-popover {
+            width: 150px;
+            height: 90px;
+        }
+
+        .award {
+            font-size: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">项目详情</h1>
+    <a class="mui-btn mui-btn-blue mui-btn-link mui-pull-right" href="#topPopover">更多</a>
+</header>
+<div class="mui-content">
+    <div id="topPopover" class="mui-popover">
+        <div class="mui-scroll-wrapper">
+            <div class="mui-scroll">
+                <ul class="mui-table-view">
+                    <li class="mui-table-view-cell mui-text-center">
+                        <a id="project_team">成员</a>
+                    </li>
+                    <li class="mui-table-view-cell mui-text-center">
+                        <a id="project_report">项目报表</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <form id='project-form' class="mui-input-group">
+        <div class="mui-input-row" hidden>
+            <label>編號</label>
+            <input id='pId' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>项目名称</label>
+            <input id='pName' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <textarea id="pDescription" rows="3" readonly="readonly"></textarea>
+        <div class="mui-input-row">
+            <label>项目总负责人</label>
+            <input id='pUserName' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <ul class="mui-table-view" id="project_stage_list">
+            <!--<li class="mui-table-view-cell">-->
+            <!--<div class="mui-table">-->
+            <!--<div class="mui-table-cell mui-col-xs-6">-->
+            <!--<div class="mui-ellipsis mui-h4">阶段一</div>-->
+            <!--<div class="mui-h5">2018-01-14－2018-06-20</div>-->
+            <!--</div>-->
+            <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+            <!--<div>-->
+            <!--<span class="award">阶段奖金:</span>-->
+            <!--<span class="mui-badge mui-badge-blue mui-text-left">5000</span>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+        <div class="mui-input-row">
+            <label>级别</label>
+            <input id='pClass' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>总奖金</label>
+            <input id='pAward' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>开始时间</label>
+            <input id='pStart' type="text" class="mui-input" readonly="readonly">
+        </div>
+        <div class="mui-input-row">
+            <label>结束时间</label>
+            <input id='pEnd' type="text" class="mui-input" readonly="readonly">
+        </div>
+    </form>
+</div>
+<script src="js/mui.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        mui.ready(function () {
+            var projectId = app.getUrlParam("projectId", window);
+            var user = app.getUser();
+            var topLeaderId;
+            var leaderId;
+            refreshDetail();
+            mui('.mui-table-view').on('tap', 'a', function (e) {
+                var id = this.getAttribute('id');
+                if (id === 'project_team') {
+                    mui.openWindow({
+                        url: 'project_team.html?projectId=' + projectId,
+                        id: 'project_team.html',
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+                } else if (id === 'start_score') {
+                    mui.openWindow({
+                        url: 'project_start_score.html?projectId=' + projectId,
+                        id: 'project_start_score.html',
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+                } else if (id === 'project_report') {
+                    mui.openWindow({
+                        url: encodeURI('project_report.html?projectId=' + projectId + '&projectName=' + $('#pName').val() + '&pUserId=' + leaderId + '&major=' + topLeaderId),
+                        id: 'project_report.html',
+                        show: {
+                            aniShow: 'pop-in'
+                        },
+                        styles: {
+                            popGesture: 'hide'
+                        },
+                        waiting: {
+                            autoShow: false
+                        }
+                    });
+                }
+                mui('#topPopover').popover('toggle');
+            });
+
+            var projectStageList = document.body.querySelector('#project_stage_list');
+
+            function refreshDetail() {
+                app.getAllData({
+                    url: app.baseURL + "selectProjectStageByProjectid?projectId=" + projectId,
+                    type: 'GET',
+                    parseFn: app.parseFn,
+                    callback: function (a_record, a_code) {
+                        switch (a_code) {
+                            case '0':
+                                projectStageList.appendChild(createFragment(a_record));
+                                break;
+                        }
+                    }
+                });
+                app.getObj({
+                    url: app.baseURL + "selectProjectByID?projectId=" + projectId,
+                    type: 'GET',
+                    parseFn: app.parseFn,
+                    callback: function (a_record, a_code, a_desc) {
+                        switch (a_code) {
+                            case '0':
+                                leaderId = a_record.pUserId;
+                                topLeaderId = a_record.major;
+                                $('#pId').val(a_record.pId);
+                                $('#pName').val(a_record.pName);
+                                $('#pDescription').val(a_record.pDescription);
+                                $('#pUserName').val(a_record.pUserName);
+                                $('#pClass').val(app.projectClass[a_record.pClass]);
+                                $('#pStart').val(app.datetimeFormat(a_record.pStart, "yyyy-MM-dd"));
+                                $('#pEnd').val(app.datetimeFormat(a_record.pEnd, "yyyy-MM-dd"));
+                                $('#pAward').val(a_record.pAward);
+                                if (user.uId === leaderId) {
+                                    var table = document.body.querySelector('.mui-table-view');
+                                    var li = document.createElement('li');
+                                    li.className = 'mui-table-view-cell mui-text-center';
+                                    var scoreA = document.createElement('a');
+                                    scoreA.id = "start_score";
+                                    scoreA.innerText = "发起评分";
+                                    li.appendChild(scoreA);
+                                    table.appendChild(li);
+
+                                    // var reportLi = document.createElement('li');
+                                    // reportLi.className = 'mui-table-view-cell mui-text-center';
+                                    // var reportA = document.createElement('a');
+                                    // reportA.id = "project_report";
+                                    // reportA.innerText = "项目报表";
+                                    // reportLi.appendChild(reportA);
+                                    // table.appendChild(reportLi);
+
+                                    $("#topPopover").height(140);
+                                }
+                                break;
+                            default:
+                                mui.toast(a_desc, {
+                                    duration: 'long',
+                                    type: 'div'
+                                })
+                        }
+                    }
+                });
+            }
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'mui-table-cell mui-col-xs-8';
+                    var projectStageDiv = document.createElement('div');
+                    projectStageDiv.className = 'mui-ellipsis mui-h4';
+                    projectStageDiv.innerHTML = item.psStageDescription;
+                    tableCellDiv.appendChild(projectStageDiv);
+                    var dateDiv = document.createElement('div');
+                    dateDiv.className = 'mui-h5';
+                    dateDiv.innerHTML = app.datetimeFormat(item.psStart, "yyyy-MM-dd") + ' / ' + app.datetimeFormat(item.psEnd, "yyyy-MM-dd");
+                    tableCellDiv.appendChild(dateDiv);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'mui-table-cell mui-col-xs-4 mui-text-right';
+                    var awardDiv = document.createElement('div');
+                    var award1Span = document.createElement('span');
+                    award1Span.className = 'award';
+                    award1Span.innerHTML = "阶段奖金:";
+                    awardDiv.appendChild(award1Span);
+                    var awardSpan = document.createElement('span');
+                    awardSpan.className = 'mui-badge mui-badge-red mui-badge-inverted';
+                    awardSpan.innerHTML = item.psAward;
+                    awardDiv.appendChild(awardSpan);
+                    tableCellDiv2.appendChild(awardDiv);
+                    tableDiv.appendChild(tableCellDiv2);
+                    li.appendChild(tableDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>

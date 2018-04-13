@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>绩效管理系统</title>
+    <link rel="stylesheet" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome-4.6.1/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/sweetalert2.min.css">
+
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.min.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script src="js/jquery.md5.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/myApp.js"></script>
+    <script src="js/sweetalert2.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #eee;
+        }
+
+        .form-signin {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+
+        .form-signin {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            height: auto;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+
+        .form-signin .input-group, #submit {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h2 align="center">绩效管理系统</h2>
+    <div class="container">
+        <form class="form-signin" role="form">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-user fa-fw" aria-hidden="true"></i></span>
+                <input type="text" id="account" class="form-control" placeholder="账号" data-toggle="tooltip" required
+                       autofocus>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock fa-fw" aria-hidden="true"></i></span>
+                <input type="password" id="password" class="form-control" placeholder="密码" required>
+            </div>
+            <button id="submit" class="btn btn-lg btn-outline-success btn-block" type="button" onclick="">登录</button>
+        </form>
+    </div>
+</div>
+<script>
+    myApp.removeCookie();
+    $("#submit").click(function () {
+        myApp.Util.getObj({
+            url: myApp.baseURL + "adminLogin?adName="+$("#account").val() +"&adPassword="+$.md5($("#password").val()),
+            type: "GET",
+            parseFn: myApp.Util.parseFn,
+            callback: function (a_record, a_code, a_desc) {
+                switch (a_code) {
+                    case '0':
+                        myApp.setUser(JSON.stringify(a_record));
+                        window.location.replace('projectinfo.html');
+                        break;
+                    default:
+                        myApp.Util.basicAlert(a_desc);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <link rel="stylesheet" href="css/mui.css">
+    <style>
+        .mui-scroll-wrapper {
+            top: 46px;
+        }
+
+        .oa-contact-cell.mui-table .mui-table-cell {
+            padding: 11px 0;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+<header class="mui-bar mui-bar-nav">
+    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title mui-action-back mui-text-center">待评分处理</h1>
+</header>
+<div class="mui-content"></div>
+<div class="mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <ul class="mui-table-view" id="aAffairs_list">
+            <!--<li class="mui-table-view-cell">-->
+            <!--<div class="mui-table">-->
+            <!--<div class="mui-table-cell mui-col-xs-6">-->
+            <!--<div class="mui-ellipsis mui-h4">发起评价会议</div>-->
+            <!--<div class="mui-h5">2018-06-20 20:00:00</div>-->
+            <!--</div>-->
+            <!--<div class="mui-table-cell mui-col-xs-6 mui-text-right">-->
+            <!--<div>NC项目</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</div>
+<script src="js/mui.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="AmazeUI-2.4.2/assets/js/amazeui.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<script>
+    (function (mui, doc) {
+        mui.init({
+            statusBarBackground: '#f7f7f7'
+        });
+        mui('.mui-scroll-wrapper').scroll();
+        mui.ready(function () {
+            var table = document.body.querySelector('.mui-table-view');
+            var user = app.getUser();
+            app.getAllData({
+                url: app.baseURL + "selectAffairIndateNotdoneByUserId?uId=" + user.uId,
+                type: 'GET',
+                parseFn: app.parseFn,
+                callback: function (a_record, a_code,a_desc) {
+                    switch (a_code) {
+                        case '0':
+                            table.appendChild(createFragment(a_record));
+                            break;
+                        default:
+                            mui.toast(a_desc, {
+                                duration: 'long',
+                                type: 'div'
+                            })
+                    }
+                }
+            });
+
+            mui('#aAffairs_list').on('tap', 'li', function (e) {
+                var id = this.getAttribute('id');
+                var jProjectId = this.name;
+                mui.openWindow({
+                    url: 'project_team_score.html?aId=' + id + '&jProjectId=' + jProjectId,
+                    id: 'project_team_score.html',
+                    show: {
+                        aniShow: 'pop-in'
+                    },
+                    styles: {
+                        popGesture: 'hide'
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+            });
+
+            function createFragment(a_record) {
+                var fragment = document.createDocumentFragment();
+                mui.each(a_record, function (index, item) {
+                    var li = document.createElement('li');
+                    li.className = 'mui-table-view-cell';
+                    li.id = item.aId;
+                    li.name = item.aProjectId;
+                    var tableDiv = document.createElement('div');
+                    tableDiv.className = 'mui-table';
+                    var tableCellDiv = document.createElement('div');
+                    tableCellDiv.className = 'mui-table-cell mui-col-xs-6';
+                    var aAffairsDiv = document.createElement('div');
+                    aAffairsDiv.className = 'mui-ellipsis mui-h4';
+                    aAffairsDiv.innerHTML = item.aAffairs;
+                    tableCellDiv.appendChild(aAffairsDiv);
+                    var dateDiv = document.createElement('div');
+                    dateDiv.className = 'mui-h5';
+                    dateDiv.innerHTML = "截止时间:" + app.datetimeFormat(item.aEnd);
+                    tableCellDiv.appendChild(dateDiv);
+                    tableDiv.appendChild(tableCellDiv);
+
+                    var tableCellDiv2 = document.createElement('div');
+                    tableCellDiv2.className = 'mui-table-cell mui-col-xs-6 mui-text-right';
+                    var projectDiv = document.createElement('div');
+                    projectDiv.innerText = item.aProjectName;
+                    tableCellDiv2.appendChild(projectDiv);
+                    tableDiv.appendChild(tableCellDiv2);
+                    li.appendChild(tableDiv);
+                    fragment.appendChild(li);
+                });
+                return fragment;
+            }
+        });
+    }(mui, document));
+</script>
+</body>
+
+</html>
