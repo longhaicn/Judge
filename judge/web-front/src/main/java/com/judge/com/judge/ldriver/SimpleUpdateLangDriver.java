@@ -23,7 +23,7 @@ public class SimpleUpdateLangDriver extends XMLLanguageDriver implements Languag
 
             for (Field field : parameterType.getDeclaredFields()) {
                 String key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
-                if(!(parameterType.getSimpleName().substring(0,1).toLowerCase()+"_id").equals(key)) {
+                if(!(parameterType.getSimpleName().substring(0,1).toLowerCase()+"_id").equals(key) && !field.isAnnotationPresent(NonInsertDb.class)) {
                     String tmp = "<if test=\"_field != null\">_column=#{_field},</if>";
                     sb.append(tmp.replaceAll("_field", field.getName()).replaceAll("_column",
                             CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName())));

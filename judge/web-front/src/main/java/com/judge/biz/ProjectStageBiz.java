@@ -1,8 +1,6 @@
 package com.judge.biz;
 
-import com.judge.dao.ProjectDao;
 import com.judge.dao.ProjectStageDao;
-import com.judge.po.Project;
 import com.judge.po.ProjectStage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +14,16 @@ public class ProjectStageBiz {
      */
     @Autowired
     private ProjectStageDao projectStageDao;
-    public int insertProjectStageObj(ProjectStage projectStage){
+
+    public int insertProjectStageObj(ProjectStage projectStage) {
         return projectStageDao.insertProjectStageObj(projectStage);
     }
-    public List<ProjectStage> selectProjectStageByProjectID(int project_id){
+
+    public List<ProjectStage> selectProjectStageByProjectID(int project_id) {
         return projectStageDao.selectProjectStageByProjectID(project_id);
+    }
+
+    public ProjectStage selectProjectStageByPsId(int pId, String start, String end) {
+        return projectStageDao.selectProjectStageByPsId(pId, start, end);
     }
 }

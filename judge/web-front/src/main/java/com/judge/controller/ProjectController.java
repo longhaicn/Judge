@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -104,14 +103,13 @@ public class ProjectController {
     @RequestMapping(value = "/searchproject")
     public void searchProject(HttpServletRequest request, HttpServletResponse response,String words) {
         try {
-            request.setCharacterEncoding("utf-8");
-            List<Project> list = projectBiz.searchProject(new String(words.getBytes("iso-8859-1"), "utf-8"));
+            List<Project> list = projectBiz.searchProject(words);
             ListObject listObject = new ListObject();
             listObject.setData(list);
             listObject.setCode(StatusCode.CODE_SUCCESS);
             listObject.setDesc("success");
             ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

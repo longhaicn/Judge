@@ -3,11 +3,9 @@ package com.judge.dao;
 import com.judge.com.judge.ldriver.SimpleInsertLangDriver;
 import com.judge.com.judge.ldriver.SimpleSelectInLangDriver;
 import com.judge.po.Affair;
+import com.judge.po.AffairMiss;
 import com.judge.po.Infect;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Lang;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.StatementType;
 
 import java.util.List;
@@ -38,4 +36,31 @@ public interface AffairDao {
 
     @Select("select * from t_affair")
     List<Affair> cpu_selectAll();
+
+    @Select("select count(*) from t_affair where a_project_id = #{0} and datetime BETWEEN CONVERT(datetime,#{1},120) AND CONVERT(datetime,#{2},120)")
+    int countAffairNum(int project_id,String start,String end);
+
+    @Select(" select u.u_nickname as username, u.u_id as uId,p.p_name as project,a.a_affairs as affair,a.a_end as endtime  " +
+            "from t_project p,t_affair a, t_infect i,t_user u " +
+            "where a.a_project_id= p.p_id and a.a_id= i.i_affair_id and i.i_scored='0' and i.i_user_id = u.u_id and i.datetime BETWEEN CONVERT(datetime,#{0},120) AND CONVERT(datetime,#{1},120)")
+    @Results({
+            @Result(column="project", property="project"),
+            @Result(column="username", property="username"),
+            @Result(column="uId", property="uId"),
+            @Result(column="affair", property="affair"),
+            @Result(column="endtime", property="endtime")
+    })
+    List<AffairMiss> select(String start,String end);
+
+    @Select("select u.u_nickname as username, u.u_id as uId,p.p_name as project,a.a_affairs as affair,a.a_end as endtime " +
+            "from t_project p,t_affair a, t_infect i,t_user u " +
+            "where a.a_project_id=p.p_id and p.p_id=#{0} and a.a_id= i.i_affair_id and i.i_scored='0' and i.i_user_id = u.u_id and i.datetime BETWEEN CONVERT(datetime,#{1},120) AND CONVERT(datetime,#{2},120)")
+    @Results({
+            @Result(column="username", property="username"),
+            @Result(column="uId", property="uId"),
+            @Result(column="project", property="project"),
+            @Result(column="affair", property="affair"),
+            @Result(column="endtime", property="endtime")
+    })
+    List<AffairMiss> selectById(int id, String start, String end);
 }

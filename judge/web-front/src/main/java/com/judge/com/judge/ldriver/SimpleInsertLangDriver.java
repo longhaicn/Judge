@@ -29,7 +29,7 @@ public class SimpleInsertLangDriver extends XMLLanguageDriver implements Languag
 
             for (Field field : parameterType.getDeclaredFields()) {
                 String key = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
-                if(!(id_part1_sb.toString()+"_id").equals(key)){
+                if(!(id_part1_sb.toString()+"_id").equals(key) && !field.isAnnotationPresent(NonInsertDb.class)){
                     sb.append(key + ",");
                     tmp.append("#{" + field.getName() + "},");
                 }

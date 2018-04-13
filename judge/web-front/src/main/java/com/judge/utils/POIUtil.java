@@ -4,7 +4,6 @@ package com.judge.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import com.judge.po.ScoreReport;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -31,9 +30,9 @@ public class POIUtil {
         cell = rowTitle.createCell(2, CellType.STRING);
         cell.setCellValue("得分");
         cell = rowTitle.createCell(3, CellType.STRING);
-        cell.setCellValue("项目奖金比例");
+        cell.setCellValue("项目奖金");
         cell = rowTitle.createCell(4, CellType.STRING);
-        cell.setCellValue("奖惩情况");
+        cell.setCellValue("工资绩效奖金");
         cell = rowTitle.createCell(5, CellType.STRING);
         cell.setCellValue("职务");
         cell = rowTitle.createCell(6, CellType.STRING);

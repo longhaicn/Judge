@@ -13,6 +13,8 @@ public class Project {
 
     private String pUserName;
 
+    private Double pUserPenalty;
+
     private Integer pClass;
 
     private Date pStart;
@@ -121,5 +123,13 @@ public class Project {
 
     public void setDatetime(Date datetime) {
         this.datetime = datetime;
+    }
+
+    public Double getpUserPenalty() {
+        return pUserPenalty;
+    }
+
+    public void setpUserPenalty(Double pUserPenalty) {
+        this.pUserPenalty = pUserPenalty;
     }
 }

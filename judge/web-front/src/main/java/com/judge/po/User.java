@@ -1,5 +1,7 @@
 package com.judge.po;
 
+import com.judge.com.judge.ldriver.NonInsertDb;
+
 import java.util.Date;
 
 public class User {
@@ -28,6 +30,9 @@ public class User {
     private String token;
 
     private Date datetime;
+
+    @NonInsertDb
+    private Double uPenalty;
 
     public Integer getuId() {
         return uId;
@@ -131,5 +136,13 @@ public class User {
 
     public void setDatetime(Date datetime) {
         this.datetime = datetime;
+    }
+
+    public Double getuPenalty() {
+        return uPenalty;
+    }
+
+    public void setuPenalty(Double uPenalty) {
+        this.uPenalty = uPenalty;
     }
 }

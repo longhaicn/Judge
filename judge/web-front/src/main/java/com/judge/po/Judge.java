@@ -110,4 +110,22 @@ public class Judge {
     public void setDatetime(Date datetime) {
         this.datetime = datetime;
     }
+
+
+    @Override
+    public String toString() {
+        return "Judge{" +
+                "jId=" + jId +
+                ", jAffairId=" + jAffairId +
+                ", jProjectId=" + jProjectId +
+                ", jEvaluatorRoleId=" + jEvaluatorRoleId +
+                ", jEvaluatorId=" + jEvaluatorId +
+                ", jEvaluatedId=" + jEvaluatedId +
+                ", jAtitude=" + jAtitude +
+                ", jQualityEfficient=" + jQualityEfficient +
+                ", jComplishment=" + jComplishment +
+                ", jReason='" + jReason + '\'' +
+                ", datetime=" + datetime +
+                '}';
+    }
 }

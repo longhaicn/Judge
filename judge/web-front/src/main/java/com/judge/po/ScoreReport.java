@@ -23,6 +23,34 @@ public class ScoreReport {
 
     String fileName;
 
+    String atitudeDetail;
+    String qualityEfficientDetail;
+    String complishmentDetail;
+
+    public String getAtitudeDetail() {
+        return atitudeDetail;
+    }
+
+    public void setAtitudeDetail(String atitudeDetail) {
+        this.atitudeDetail = atitudeDetail;
+    }
+
+    public String getQualityEfficientDetail() {
+        return qualityEfficientDetail;
+    }
+
+    public void setQualityEfficientDetail(String qualityEfficientDetail) {
+        this.qualityEfficientDetail = qualityEfficientDetail;
+    }
+
+    public String getComplishmentDetail() {
+        return complishmentDetail;
+    }
+
+    public void setComplishmentDetail(String complishmentDetail) {
+        this.complishmentDetail = complishmentDetail;
+    }
+
     public String getFileName() {
         return fileName;
     }
@@ -163,14 +191,25 @@ public class ScoreReport {
     public String toString() {
         return "ScoreReport{" +
                 "uId=" + uId +
-                ", pName='" + pName + '\'' +
                 ", uUsername='" + uUsername + '\'' +
+                ", pAward=" + pAward +
+                ", pName='" + pName + '\'' +
                 ", role1_score=" + role1_score +
                 ", role2_score=" + role2_score +
                 ", role3_score=" + role3_score +
                 ", role4_score=" + role4_score +
+                ", uAfairSum=" + uAfairSum +
+                ", scoreSum=" + scoreSum +
                 ", evSum='" + evSum + '\'' +
                 ", uRole='" + uRole + '\'' +
+                ", pStart='" + pStart + '\'' +
+                ", pEnd='" + pEnd + '\'' +
+                ", uProportion='" + uProportion + '\'' +
+                ", uPerformance='" + uPerformance + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", atitudeDetail='" + atitudeDetail + '\'' +
+                ", qualityEfficientDetail='" + qualityEfficientDetail + '\'' +
+                ", complishmentDetail='" + complishmentDetail + '\'' +
                 '}';
     }
 }

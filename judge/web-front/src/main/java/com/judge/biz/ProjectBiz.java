@@ -12,13 +12,10 @@ import com.judge.po.Project;
 import com.judge.po.ProjectStage;
 import com.judge.po.User;
 import com.judge.utils.JsonUtils;
-import com.judge.utils.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -40,31 +37,33 @@ public class ProjectBiz {
     @Autowired
     private OrgnizationDao orgnizationDao;
 
-    public List<Project> queryProjectByUId(int u_id){
+    public List<Project> queryProjectByUId(int u_id) {
         return projectDao.queryProjectByUId(u_id);
     }
 
-    public Project queryProjectById(int p_id){
+    public Project queryProjectById(int p_id) {
         return projectDao.queryProjectById(p_id);
     }
 
-    public List<Project> selectProjectByOrguserID(int o_user_id){
+    public List<Project> selectProjectByOrguserID(int o_user_id) {
         return projectDao.selectProjectByOrguserID(o_user_id);
     }
-    public List<Project> selectAllProject(){
+
+    public List<Project> selectAllProject() {
         return projectDao.selectAllProject();
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void insertProject(String data) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        try{
+        try {
             Project project = new Project();
             JSONObject project_json = JSON.parseObject(data);
             project.setpName(project_json.getString("pName"));
             project.setpDescription(project_json.getString("pDescription"));
             project.setpUserId(project_json.getInteger("pUserId"));
             project.setpUserName(project_json.getString("pUserName"));
+            project.setpUserPenalty(project_json.getDouble("pUserPenalty"));
             project.setMajor(project_json.getInteger("major"));
             project.setMajorName(project_json.getString("majorName"));
             project.setpClass(project_json.getInteger("pClass"));
@@ -92,20 +91,24 @@ public class ProjectBiz {
             Orgnization orgnization = new Orgnization();
             orgnization.setoUserId(major.getuId());
             orgnization.setoUserName(major.getuNickname());
+            orgnization.setoPenalty(0.00);
             orgnization.setoRoleId(1);//major
             orgnization.setDatetime(new Date());
             orgnization.setoProjectId(project.getpId());
             orgnization.setoProjectName(project.getpName());
+            orgnization.setoStatus(0);
             orgnizationDao.insertOrgObj(orgnization);
 
             //add  projectOwner
             orgnization = new Orgnization();
             orgnization.setoUserId(project.getpUserId());
             orgnization.setoUserName(project.getpUserName());
+            orgnization.setoPenalty(project.getpUserPenalty());
             orgnization.setoRoleId(2);
             orgnization.setDatetime(new Date());
             orgnization.setoProjectId(project.getpId());
             orgnization.setoProjectName(project.getpName());
+            orgnization.setoStatus(0);
             orgnizationDao.insertOrgObj(orgnization);
 
             JSONArray users_ja = project_json.getJSONArray("users");
@@ -114,15 +117,18 @@ public class ProjectBiz {
                 orgnization.setoUserId(users_ja.getJSONObject(i).getIntValue("uId"));
                 orgnization.setoUserName(users_ja.getJSONObject(i).getString("uNickname"));
                 orgnization.setoRoleId(users_ja.getJSONObject(i).getIntValue("uRole"));
+                orgnization.setoPenalty(users_ja.getJSONObject(i).getDoubleValue("uPenalty"));
                 orgnization.setDatetime(new Date());
                 orgnization.setoProjectId(project.getpId());
                 orgnization.setoProjectName(project.getpName());
+                orgnization.setoStatus(0);
                 orgnizationDao.insertOrgObj(orgnization);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
     }
+
     public List<Project> searchProject(String words) {
         return projectDao.searchProject(words);
     }

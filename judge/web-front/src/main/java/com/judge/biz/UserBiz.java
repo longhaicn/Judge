@@ -15,34 +15,41 @@ public class UserBiz {
      */
     @Autowired
     private UserDao userDao;
-    public User findById(Integer info_id){
+
+    public User findById(Integer info_id) {
         return userDao.findById(info_id);
     }
-    public User findByOAId(String oa_id){
+
+    public User findByOAId(String oa_id) {
         return userDao.findByOAId(oa_id);
     }
-    public User findByDingId(String ding_id){
+
+    public User findByDingId(String ding_id) {
         return userDao.findByDingId(ding_id);
     }
-    public User loginByPass(String u_username,String u_password){
-        return userDao.loginByPass(u_username,u_password);
-    }
-    public User loginByToken(Integer u_id,String token){
-        return userDao.loginByToken(u_id,token);
+
+    public User loginByPass(String u_username, String u_password) {
+        return userDao.loginByPass(u_username, u_password);
     }
 
-    public int insertUserObj(User user){
+    public User loginByToken(Integer u_id, String token) {
+        return userDao.loginByToken(u_id, token);
+    }
+
+    public int insertUserObj(User user) {
         return userDao.insertUserObj(user);
     }
-    public int updateUserObj(User user){
-        if (userDao.findByOAId(user.getOaId()) != null){
+
+    public int updateUserObj(User user) {
+        if (userDao.findByOAId(user.getOaId()) != null) {
             return userDao.updateUserObj(user);
-        }else{
+        } else {
             return userDao.insertUserObj(user);
         }
     }
-    public List<User> search(String words){
-        words = "%"+words+"%";
+
+    public List<User> search(String words) {
+        words = "%" + words + "%";
         return userDao.search(words);
     }
 }

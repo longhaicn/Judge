@@ -1,8 +1,6 @@
 package com.judge.dao;
 
 import com.judge.com.judge.ldriver.SimpleInsertLangDriver;
-import com.judge.com.judge.ldriver.SimpleUpdateLangDriver;
-import com.judge.po.Affair;
 import com.judge.po.Infect;
 import com.judge.po.User;
 import org.apache.ibatis.annotations.*;
@@ -27,4 +25,5 @@ public interface InfectDao {
 
     @Select("select * from t_infect where i_affair_id = #{a_id}")
     List<Infect> cpu_selectByAId(int a_id);
+
 }

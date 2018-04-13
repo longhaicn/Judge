@@ -25,7 +25,7 @@ public interface ProjectDao {
 
     /* 3、 根据人员ID查询所在项目信息
      */
-    @Select("select p.* from t_project p join t_orgnization o on p.p_id = o.o_project_id  where o.o_user_id = #{o_user_id} order by p_class desc,p_start desc")
+    @Select("select p.* from t_project p join t_orgnization o on o.o_status = 0 and p.p_id = o.o_project_id  where o.o_user_id = #{o_user_id} order by p_class desc,p_start desc")
     List<Project> selectProjectByOrguserID(int o_user_id);
 
     @Select("select * from t_project order by p_class desc,p_start desc")

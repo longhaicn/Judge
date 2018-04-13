@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -29,10 +30,12 @@ public class ScoreReportController {
     /*
      * 获取指定id的用户
      */
+
+
     @RequestMapping(value = "/scorereports")
-    public void getScoreReprot(HttpServletRequest request, HttpServletResponse response,String sr_start, String sr_end) {
+    public void getScoreReprot(HttpServletRequest request, HttpServletResponse response,String start, String end) {
         try {
-            List<ScoreReport> list = scoreReportBiz.getScoreReprots(sr_start, sr_end);
+            List<ScoreReport> list = scoreReportBiz.getScoreReprots(start, end);
             ListObject listObject = new ListObject();
             listObject.setData(list);
             listObject.setCode(StatusCode.CODE_SUCCESS);
@@ -48,11 +51,33 @@ public class ScoreReportController {
         }
     }
 
-    @RequestMapping(value = "/scorereport")
-    public void getScoreReprot(HttpServletRequest request, HttpServletResponse response,String sr_pId, String sr_start, String sr_end) {
+
+    @RequestMapping(value = "/scorereportbyid")
+    public void getScoreReprot(HttpServletRequest request, HttpServletResponse response,String projectId,String uId, String start, String end) {
         try {
-            int id = Integer.parseInt(sr_pId);
-            List<ScoreReport> list = scoreReportBiz.getScoreReprot(id, sr_start, sr_end);
+            int pId = Integer.parseInt(projectId);
+            int uid = Integer.parseInt(uId);
+            List<ScoreReport> list =  new ArrayList<ScoreReport>();
+            list.add( scoreReportBiz.getScoreReprotById(pId,uid,start, end));
+            ListObject listObject = new ListObject();
+            listObject.setData(list);
+            listObject.setCode(StatusCode.CODE_SUCCESS);
+            listObject.setDesc("success");
+            ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
+        } catch (Exception e) {
+            e.printStackTrace();
+            ListObject listObject = new ListObject();
+            listObject.setData(null);
+            listObject.setCode(StatusCode.CODE_ERROR);
+            listObject.setDesc("desc:" + e.getMessage());
+            ResponseUtils.renderJson(response, JsonUtils.toJson(listObject));
+        }
+    }
+    @RequestMapping(value = "/scorereport")
+    public void getScoreReprot(HttpServletRequest request, HttpServletResponse response,String projectId, String start, String end) {
+        try {
+            int id = Integer.parseInt(projectId);
+            List<ScoreReport> list = scoreReportBiz.getScoreReprot(id, start, end);
             ListObject listObject = new ListObject();
             listObject.setData(list);
             listObject.setCode(StatusCode.CODE_SUCCESS);

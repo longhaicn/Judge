@@ -5,6 +5,7 @@ import com.judge.dao.InfectDao;
 import com.judge.dao.OrgnizationDao;
 import com.judge.dao.UserDao;
 import com.judge.po.Affair;
+import com.judge.po.AffairMiss;
 import com.judge.po.Infect;
 import com.judge.po.User;
 import com.judge.utils.DingTalkService;
@@ -39,7 +40,7 @@ public class AffairBiz {
      * 发起评分事件
      */
     @Transactional(rollbackFor = Exception.class)
-    public void newAffair(Affair affair,int[] userids){
+    public void newAffair(Affair affair, int[] userids) {
         affairDao.insertAffairObj(affair);
         for (int i = 0; i < userids.length; i++) {
             Infect infect = new Infect();
@@ -52,77 +53,100 @@ public class AffairBiz {
 
         List<User> users = userDao.selectInIds(userids);
         String[] ding_ids = new String[users.size()];
-        for(int i = 0;i<users.size();i++){
+        for (int i = 0; i < users.size(); i++) {
             ding_ids[i] = users.get(i).getDingId();
         }
         String accessToken = DingTalkService.getAccessToken();
         //发送钉钉消息通知人员评分
-        DingTalkService.sendDingMsg(accessToken, ding_ids, MSG_TITLE,affair.getaAffairs(),INDEX_URL);
+        DingTalkService.sendDingMsg(accessToken, ding_ids, MSG_TITLE, affair.getaAffairs(), INDEX_URL);
     }
 
     /**
      * 截止现在为止，还有效的评分事件
+     *
      * @param project_id
      * @return
      */
-    public List<Affair> selectAffairIndate(int project_id){
+    public List<Affair> selectAffairIndate(int project_id) {
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return affairDao.selectAffairIndate(project_id,local_sdf.format(new Date()));
+        return affairDao.selectAffairIndate(project_id, local_sdf.format(new Date()));
     }
 
     /**
      * 截止现在为止，无效的评分事件
+     *
      * @param project_id
      * @return
      */
-    public List<Affair> selectAffairOutdate(int project_id){
+    public List<Affair> selectAffairOutdate(int project_id) {
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return affairDao.selectAffairOutdate(project_id,local_sdf.format(new Date()));
+        return affairDao.selectAffairOutdate(project_id, local_sdf.format(new Date()));
     }
 
     /**
      * 截止现在为止，还未完成评分的评分事件
+     *
      * @param o_user_id
      * @return
      */
-    public List<Affair> selectAffairIndateNotdoneByUserId(int o_user_id){
+    public List<Affair> selectAffairIndateNotdoneByUserId(int o_user_id) {
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return affairDao.selectAffairIndateNotdoneByUserId(local_sdf.format(new Date()),o_user_id);
+        return affairDao.selectAffairIndateNotdoneByUserId(local_sdf.format(new Date()), o_user_id);
     }
 
     /**
      * 截止现在为止，还有效的评分事件
+     *
      * @param o_user_id
      * @return
      */
-    public List<Affair> selectAffairIndateByUserId(int o_user_id){
+    public List<Affair> selectAffairIndateByUserId(int o_user_id) {
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return affairDao.selectAffairIndateByUserId(local_sdf.format(new Date()),o_user_id);
+        return affairDao.selectAffairIndateByUserId(local_sdf.format(new Date()), o_user_id);
     }
 
     /**
      * 截止现在为止，无效的评分事件
+     *
      * @param o_user_id
      * @return
      */
-    public List<Affair> selectAffairOutdateByUserId(int o_user_id){
+    public List<Affair> selectAffairOutdateByUserId(int o_user_id) {
         SimpleDateFormat local_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return affairDao.selectAffairOutdateByUserId(local_sdf.format(new Date()),o_user_id);
+        return affairDao.selectAffairOutdateByUserId(local_sdf.format(new Date()), o_user_id);
     }
 
     /**
      * 查询需要评分的对象
+     *
      * @param a_id
      * @param u_id
      * @return
      */
-    public List<User> selectUsersForJudge(int a_id,int u_id){
-        User user = orgnizationDao.getUserByAIdAndUId(a_id,u_id);
-        if(user.getuRole() == 1){
+    public List<User> selectUsersForJudge(int a_id, int u_id) {
+        User user = orgnizationDao.getUserByAIdAndUId(a_id, u_id);
+        if (user.getuRole() == 1) {
             //CEO
             return userDao.selectUsersForJudgeCEO(a_id);
-        }else{
-            return userDao.selectUsersForJudge(a_id,u_id);
+        } else {
+            return userDao.selectUsersForJudge(a_id, u_id);
         }
+    }
+
+    /**
+     * 查询一段时间内发起评分数
+     *
+     * @param project_id
+     * @param start
+     * @param end
+     * @return
+     */
+    public int countAffairNum(int project_id, String start, String end) {
+        return affairDao.countAffairNum(project_id, start, end);
+    }
+
+    public List<AffairMiss> missaffair(String start, String end) {
+
+        return affairDao.select(start, end);
     }
 }

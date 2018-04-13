@@ -18,4 +18,7 @@ public interface ProjectStageDao {
 
     @Select("select * from t_project_stage where ps_project_id = #{project_id}")
     List<ProjectStage> selectProjectStageByProjectID(int project_id);
+
+    @Select("  select * from t_project_stage where ps_project_id= #{0} and ps_start= #{1} and ps_end =#{2}")
+    ProjectStage selectProjectStageByPsId(int pid,String start,String end);
 }

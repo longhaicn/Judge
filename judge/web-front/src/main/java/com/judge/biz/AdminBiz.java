@@ -12,11 +12,11 @@ public class AdminBiz {
     @Autowired
     private AdminDao adminDao;
 
-    public Admin adminLogin(String name ,String pwd) {
-        return adminDao.adminLogin(name,pwd);
+    public Admin adminLogin(String name, String pwd) {
+        return adminDao.adminLogin(name, pwd);
     }
 
     public int adminchangepwd(String ad_name, String ad_pwd, String new_pwd) {
-        return adminDao.adminchangepwd(ad_name,ad_pwd,new_pwd);
+        return adminDao.adminchangepwd(ad_name, ad_pwd, new_pwd);
     }
 }

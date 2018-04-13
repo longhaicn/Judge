@@ -13,9 +13,21 @@ public class Orgnization {
 
     private String oUserName;
 
+    private Double oPenalty;
+
     private Integer oRoleId;
 
     private Date datetime;
+
+    private Integer oStatus;
+
+    public Integer getoStatus() {
+        return oStatus;
+    }
+
+    public void setoStatus(Integer oStatus) {
+        this.oStatus = oStatus;
+    }
 
     public Integer getoId() {
         return oId;
@@ -71,5 +83,13 @@ public class Orgnization {
 
     public void setDatetime(Date datetime) {
         this.datetime = datetime;
+    }
+
+    public Double getoPenalty() {
+        return oPenalty;
+    }
+
+    public void setoPenalty(Double oPenalty) {
+        this.oPenalty = oPenalty;
     }
 }

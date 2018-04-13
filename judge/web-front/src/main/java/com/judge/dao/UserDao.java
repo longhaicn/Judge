@@ -61,10 +61,10 @@ public interface UserDao {
      * @param u_id
      * @return
      */
-    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime \n" +
-            "  from t_infect i join t_user u on i.i_user_id = u.u_id \n" +
-            "  join t_affair a on i.i_affair_id = a.a_id \n" +
-            "  join t_orgnization o on a.a_project_id = o.o_project_id and i.i_user_id = o.o_user_id \n" +
+    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime" +
+            "  from t_infect i join t_user u on i.i_user_id = u.u_id " +
+            "  join t_affair a on i.i_affair_id = a.a_id" +
+            "  join t_orgnization o on o.o_status = 0 and a.a_project_id = o.o_project_id and i.i_user_id = o.o_user_id " +
             "  where o.o_role_id !=1 and i.i_affair_id = #{0} and u.u_id != #{1}")
     List<User> selectUsersForJudge(int a_id,int u_id);
 
@@ -73,8 +73,8 @@ public interface UserDao {
      * @param a_id
      * @return
      */
-    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime \n" +
-            "  from t_affair a join t_user u on a.a_sponser_id = u.u_id \n" +
+    @Select("select u.u_id,u.oa_id,u.ding_id,u.u_nickname,u.u_short_name,u.u_username,u.u_email,u.u_status,u.u_role,u.u_department,u.token,u.datetime " +
+            "  from t_affair a join t_user u on a.a_sponser_id = u.u_id " +
             "  where a.a_id = #{a_id}")
     List<User> selectUsersForJudgeCEO(int a_id);
 }
